@@ -1,5 +1,5 @@
 import flet as ft
-from cliente import vista_clientes
+from UI.cliente_ui import vista_clientes
 from servicios import lista_servicios
 from home import home
 from pago import pago_container
