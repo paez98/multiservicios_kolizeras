@@ -11,7 +11,7 @@ print(os.getenv('host'))           # Dirección (localhost = tu pc)
 print(os.getenv('port'))           # Puerto predeterminado = 5432
 
 
-class Database:
+class Conexion:
     def __init__(self):
         self.conn = psycopg2.connect(
             dbname=os.getenv('dbname'),    # Nombre de la base de datos
@@ -40,7 +40,7 @@ class Database:
         self.conn.close()    # Cierra la puerta de la casa
 
 
-db = Database()
+db = Conexion()
 
 
 try:

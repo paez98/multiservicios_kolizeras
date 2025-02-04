@@ -1,26 +1,24 @@
-from conection import Database
+from models.cliente import Cliente
 
-db = Database()
+cliente = Cliente()
 
 
 def cargar_clientes():
     """Carga los clientes desde la base de datos."""
     try:
-        clientes = db.fetch_all(
-            "SELECT id, nombre, telefono, direccion FROM cliente")
-        return clientes
+        clientes = Cliente.cargar_todos()
+        return [{'id': c.id, 'nombre': c.nombre, 'telefono': c.telefono, 'direccion': c.direccion} for c in clientes]
     except Exception as e:
-        print(f"Error al cargar clientes: {e}")
+        print(f"Error al cargar los clientes: {e}")
         return []
 
 
-def guardar_cliente(nombre, contacto, direccion):
+def guardar_cliente(nombre, telefono, direccion):
     """Guarda un nuevo cliente en la base de datos."""
     try:
-        db.execute(
-            "INSERT INTO cliente (nombre, telefono, direccion) VALUES (%s, %s, %s)",
-            (nombre, contacto, direccion)
-        )
+        nuevo_cliente = Cliente(
+            nombre=nombre, telefono=telefono, direccion=direccion)
+        nuevo_cliente.guardar()
         print("Cliente registrado exitosamente.")
     except Exception as e:
         print(f"Error al registrar cliente: {e}")
@@ -29,19 +27,27 @@ def guardar_cliente(nombre, contacto, direccion):
 def eliminar_cliente(cliente_id):
     """Elimina un cliente de la base de datos."""
     try:
-        db.execute("DELETE FROM cliente WHERE id = %s", (cliente_id,))
-        print("Cliente eliminado exitosamente.")
+        cliente = Cliente.buscar_por_id(cliente_id)
+        if cliente:
+            cliente.eliminar()
+            print("Cliente eliminado exitosamente.")
+        else:
+            print('Cliente no encontrado')
     except Exception as e:
         print(f"Error al eliminar cliente: {e}")
 
 
-def editar_cliente(cliente_id, nombre, contacto, direccion):
+def editar_cliente(cliente_id, nombre, telefono, direccion):
     """Edita un cliente en la base de datos."""
     try:
-        db.execute(
-            "UPDATE cliente SET nombre = %s, telefono = %s, direccion = %s WHERE id = %s",
-            (nombre, contacto, direccion, cliente_id)
-        )
-        print("Cliente actualizado exitosamente.")
+        cliente = Cliente.buscar_por_id(cliente_id)
+        if cliente:
+            cliente.nombre = nombre
+            cliente.telefono = telefono
+            cliente.direccion = direccion
+            cliente.actualizar()
+            print("Cliente actualizado exitosamente.")
+        else:
+            print('Cliente no encontrado')
     except Exception as e:
         print(f"Error al actualizar cliente: {e}")

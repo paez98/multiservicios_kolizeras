@@ -1,5 +1,5 @@
 import flet as ft
-from UI.cliente_ui import lista_clientes
+from ui.cliente_ui import lista_clientes
 from tabs import tabs
 
 
