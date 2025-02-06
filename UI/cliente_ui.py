@@ -1,5 +1,5 @@
 import flet as ft
-from logica import cargar_clientes, guardar_cliente, eliminar_cliente, editar_cliente
+from logica.crear_cliente import guardar_cliente
 
 # ===============================================
 #     ELEMENTOS DE LA INTERFAZ (Solo gráficos)
@@ -58,7 +58,9 @@ lista_clientes = ft.DataTable(
         ft.DataColumn(ft.Text("Dirección")),
     ],
     rows=[],
-    expand=True
+    expand=True,
+
+
 )
 
 vista_clientes = ft.Container(
@@ -75,13 +77,21 @@ vista_clientes = ft.Container(
                     btn_editar
                 ]
             ),
-            ft.Column([lista_clientes], expand=True)
+            ft.Column(
+                controls=[
+                    ft.Text('Clientes registrados', size=25),
+                    lista_clientes
+
+                ],
+                expand=True,
+            )
         ],
         spacing=40,
-        expand=True
+        expand=True,
     ),
     border=ft.border.all(2, "#BBDEFB"),
-    expand=True
+    expand=True,
+    padding=20
 )
 
 

@@ -38,23 +38,3 @@ class Conexion:
     def close(self):
         self.cursor.close()  # Cierra el mando a distancia
         self.conn.close()    # Cierra la puerta de la casa
-
-
-db = Conexion()
-
-
-try:
-    # Insertar cliente
-    # Insertar cliente usando parámetros
-    db.execute(
-        "INSERT INTO cliente (nombre, telefono, direccion) VALUES ( %s, %s, %s)",
-        ('Ad23123213123', '04123550450', 'el portal')
-    )
-
-    resultados = db.fetch_all("SELECT * FROM cliente")
-    print(resultados)
-except Exception as error:
-    print(f'Error: {error}')
-
-finally:
-    db.close()

@@ -1,8 +1,11 @@
 import flet as ft
+
 from ui.cliente_ui import vista_clientes
 from servicios import lista_servicios
 from home import home
 from pago import pago_container
+
+# m = main()
 
 
 tabs = ft.Tabs(

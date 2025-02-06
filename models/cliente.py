@@ -19,7 +19,7 @@ class Cliente:
     def guardar(self):
         '''Guarda el cliente en la base de datos'''
         try:
-            query = "INSERT INTO cliente(nombre, telefono, direccion) VALUS (%s, %s, %s)"
+            query = "INSERT INTO cliente(nombre, telefono, direccion) VALUES (%s, %s, %s)"
             self.db.execute(
                 query, (self.nombre, self.telefono, self.direccion))
             print('Cliente registrado exitoso')
@@ -59,7 +59,7 @@ class Cliente:
         '''
         db = Conexion()
         try:
-            query = "SELECT id, nombre, telefono, direccion FROM cliente"
+            query = "SELECT cliente_id, nombre, telefono, direccion FROM cliente"
             resultados = db.fetch_all(query)
             clientes = []
             for row in resultados:
@@ -80,7 +80,7 @@ class Cliente:
         """
         db = Conexion()
         try:
-            query = 'SELECT id, nombre, telefono, direccion FROM cliente WHERE id = %s'
+            query = 'SELECT cliente_id, nombre, telefono, direccion FROM cliente WHERE id = %s'
             resultado = db.fetch_all(query, (cliente_id))
             if resultado:
                 row = resultado[0]

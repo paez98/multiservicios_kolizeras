@@ -1,5 +1,5 @@
 import flet as ft
-from ui.cliente_ui import lista_clientes
+from ui.registro_ui import RegistroUI
 from tabs import tabs
 
 
@@ -11,6 +11,15 @@ def main(page: ft.Page):
     page.window_resizable = True  # Permite redimensionar
     page.theme_mode = ft.ThemeMode.LIGHT
     tabs
+    open_registro_dialog = RegistroUI(page)
+    btn_abrir_registro = ft.ElevatedButton(
+        text="Registrar Cliente",
+        icon=ft.icons.PERSON_ADD,
+        width=200,
+        height=50,
+        style=ft.ButtonStyle(bgcolor="#2196F3", color="white"),
+        on_click=open_registro_dialog
+    )
     page.add(tabs)
 
 
