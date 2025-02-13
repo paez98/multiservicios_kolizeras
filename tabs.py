@@ -5,11 +5,8 @@ from servicios import lista_servicios
 from home import home
 from pago import pago_container
 
-# m = main()
-
-
 tabs = ft.Tabs(
-    selected_index=1,
+    selected_index=0,
     animation_duration=300,
 
     tabs=[
@@ -34,6 +31,7 @@ tabs = ft.Tabs(
             icon=ft.Icons.ATTACH_MONEY,
             content=pago_container,
         ),
+
     ],
     expand=1,
 

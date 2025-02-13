@@ -101,34 +101,3 @@ pago_container = ft.Container(
     padding=20,
     expand=True
 )
-
-# ===============================================
-# INTEGRACIÓN EN LAS PESTAÑAS
-# ===============================================
-# tabs = ft.Tabs(
-#     selected_index=1,
-#     animation_duration=300,
-#     tabs=[
-#         ft.Tab(
-#             text='Home',
-#             icon=ft.Icons.HOME,
-#             content=home
-#         ),
-#         ft.Tab(
-#             text="Clientes",
-#             icon=ft.Icons.PEOPLE_ALT,
-#             content=lista_clientes
-#         ),
-#         ft.Tab(
-#             text='Servicios',
-#             icon=ft.Icons.DESIGN_SERVICES,
-#             content=lista_servicios
-#         ),
-#         ft.Tab(  # Nueva pestaña de pagos
-#             text="Pagos",
-#             icon=ft.icons.ATTACH_MONEY,
-#             content=pago_container
-#         ),
-#     ],
-#     expand=1,
-# )
