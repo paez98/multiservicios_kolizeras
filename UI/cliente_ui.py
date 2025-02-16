@@ -132,6 +132,8 @@ btn_editar = crear_boton(
     "Editar", ft.icons.EDIT_SQUARE, editar_cliente_seleccionado, "yellow"
 )
 
+btn = ft.IconButton(icon=ft.Icons.REPLAY)
+
 lista_clientes = ft.DataTable(
     bgcolor="yellow",
     border=ft.border.all(2, "red"),
@@ -197,6 +199,7 @@ vista_clientes = ft.Container(
                         width=100,
                         disabled=True,
                     ),
+                    btn,
                 ]
             ),
             lista_clientes,
