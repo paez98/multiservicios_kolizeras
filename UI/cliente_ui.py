@@ -1,5 +1,5 @@
 import flet as ft
-from logica.crear_cliente import guardar_cliente
+
 from logica.eliminar_cliente import eliminar_cliente
 from logica.editar_cliente import editar_cliente
 from logica.cargar_cliente import cargar_clientes
@@ -17,7 +17,7 @@ def validar_campos(nombre, contacto):
     if not nombre:
         errores["nombre"] = "Campo obligatorio"
     if not contacto:
-        errores[contacto] = "Campo obligatorio"
+        errores["contacto"] = "Campo obligatorio"
     return errores
 
 
@@ -31,23 +31,6 @@ def limpiar_campos():
     txt_nombre.update()
     txt_contacto.update()
     txt_direccion.update()
-
-
-def guardar_cliente_nuevo():
-    errores = validar_campos(txt_nombre.value.strip(), txt_contacto.value.strip())
-    if errores:
-        txt_nombre.error_text = errores.get("nombre", "")
-        txt_contacto.error_text = errores.get("contacto", "")
-        txt_nombre.update()
-        txt_contacto.update()
-        return
-    guardar_cliente(
-        txt_direccion.value.strip(),
-        txt_contacto.value.strip(),
-        txt_direccion.value.strip(),
-    )
-    limpiar_campos()
-    cargar_clientes_en_tabla()
 
 
 def obtener_cliente_seleccionado():
@@ -93,7 +76,7 @@ def eliminar_cliente_seleccionado(e):
     cargar_clientes_en_tabla()
 
 
-def cargar_clientes_en_tabla():
+def cargar_clientes_en_tabla(e=None):
     """Carga los clientes en la tabla."""
     clientes = cargar_clientes()
     lista_clientes.rows = [
@@ -104,6 +87,7 @@ def cargar_clientes_en_tabla():
                 ft.DataCell(ft.Text(cliente["telefono"])),
                 ft.DataCell(ft.Text(cliente["direccion"])),
             ],
+            color="red",
         )
         for cliente in clientes
     ]
@@ -122,9 +106,6 @@ txt_nombre = crear_campo_texto("Nombre del cliente", "Ej: Alissa")
 txt_contacto = crear_campo_texto("Contacto", "Ej: +56912345678")
 txt_direccion = crear_campo_texto("Dirección", "Ej: Calle Principal #123")
 
-btn_guardar = crear_boton(
-    "Guardar", ft.icons.SAVE_SHARP, guardar_cliente_nuevo, "#2196F3"
-)
 btn_eliminar = crear_boton(
     "Eliminar", ft.icons.DELETE_FOREVER, eliminar_cliente_seleccionado, "red"
 )
@@ -132,9 +113,26 @@ btn_editar = crear_boton(
     "Editar", ft.icons.EDIT_SQUARE, editar_cliente_seleccionado, "yellow"
 )
 
-btn = ft.IconButton(icon=ft.Icons.REPLAY)
+btn_actualizar = ft.IconButton(icon=ft.Icons.REPLAY, on_click=cargar_clientes_en_tabla)
+
 
 lista_clientes = ft.DataTable(
+    data_row_color={ft.ControlState.PRESSED: "black"},
+    columns=[
+        ft.DataColumn(ft.Text("ID")),
+        ft.DataColumn(ft.Text("Nombre")),
+        ft.DataColumn(ft.Text("Contacto")),
+        ft.DataColumn(ft.Text("Dirección")),
+    ],
+    show_bottom_border=True,
+    rows=[],
+    expand=True,
+    border=ft.border.all(2, ft.Colors.GREY_300),
+    # border_radius=4,
+)
+
+lista_clientes_2 = ft.DataTable(
+    width=700,
     bgcolor="yellow",
     border=ft.border.all(2, "red"),
     border_radius=10,
@@ -149,16 +147,26 @@ lista_clientes = ft.DataTable(
     divider_thickness=0,
     column_spacing=200,
     columns=[
-        ft.DataColumn(ft.Text("ID")),
-        ft.DataColumn(ft.Text("Nombre")),
-        ft.DataColumn(ft.Text("Contacto")),
-        ft.DataColumn(ft.Text("Dirección")),
+        ft.DataColumn(
+            ft.Text("Column 1"),
+            on_sort=lambda e: print(f"{e.column_index}, {e.ascending}"),
+        ),
+        ft.DataColumn(
+            ft.Text("Column 2"),
+            tooltip="This is a second column",
+            numeric=True,
+            on_sort=lambda e: print(f"{e.column_index}, {e.ascending}"),
+        ),
     ],
-    show_bottom_border=True,
-    rows=[],
-    expand=True,
+    rows=[
+        ft.DataRow(
+            [ft.DataCell(ft.Text("A")), ft.DataCell(ft.Text("1"))],
+            selected=True,
+            on_select_changed=lambda e: print("row select changed:"),
+        ),
+        ft.DataRow([ft.DataCell(ft.Text("B")), ft.DataCell(ft.Text("2"))]),
+    ],
 )
-
 # ===============================================
 # FIN DE LOS ELEMENTOS
 # ===============================================
@@ -199,7 +207,7 @@ vista_clientes = ft.Container(
                         width=100,
                         disabled=True,
                     ),
-                    btn,
+                    btn_actualizar,
                 ]
             ),
             lista_clientes,

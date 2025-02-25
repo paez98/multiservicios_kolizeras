@@ -1,0 +1,6 @@
+flet~=0.27.1
+supabase~=2.13.0
+dotenv
+python >= 3.13
+psycopg2-binary~=2.9.10
+python-dotenv~=1.0.1

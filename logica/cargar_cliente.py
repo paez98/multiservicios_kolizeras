@@ -11,11 +11,9 @@ def cargar_clientes():
         return []
 
 
+# Logica para cargar clientes desde postgre
 # from models.cliente import Cliente
-
 # cliente = Cliente()
-
-
 # def cargar_clientes():
 #     """Carga los clientes desde la base de datos."""
 #     try:

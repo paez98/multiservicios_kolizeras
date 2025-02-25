@@ -1,13 +1,15 @@
-from models.cliente import Cliente
-
-cliente = Cliente()
+from client_supabase import supabase
+# from faker import Faker
 
 
 def guardar_cliente(nombre, telefono, direccion):
     """Guarda un nuevo cliente en la base de datos."""
     try:
-        nuevo_cliente = Cliente(nombre=nombre, telefono=telefono, direccion=direccion)
-        nuevo_cliente.guardar()
-        print("Cliente registrado exitosamente.")
+        response = (
+            supabase.table("clientes")
+            .insert({"nombre": nombre, "telefono": telefono, "direccion": direccion})
+            .execute()
+        )
+        print(f"Cliente registrado {response}")
     except Exception as e:
-        print(f"Error al registrar cliente: {e}")
+        print(f"Error al resgistrar el cliente{e}")
