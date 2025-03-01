@@ -4,14 +4,14 @@ from ui.cliente_ui import cargar_clientes_en_tabla
 
 
 def main(page: ft.Page):
-    # quedamos en colocarle hover a las filas del DATATABLE*/**/**/*/*////////
     # Configuración de la ventana
+    page.bgcolor = ft.Colors.INDIGO_700
     page.title = "Taller Mecánico App"
     page.window_width = 1000
     page.window_height = 600
     page.window_resizable = True  # Permite redimensionar
-    page.theme_mode = ft.ThemeMode.LIGHT
-    page.bgcolor = "#214d6e"
+    page.theme_mode = ft.ThemeMode.DARK
+    # page.bgcolor = "#214d6e"
 
     page.add(tabs)
 
