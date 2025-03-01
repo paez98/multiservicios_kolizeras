@@ -4,12 +4,30 @@ from logica.eliminar_cliente import eliminar_cliente
 from logica.editar_cliente import editar_cliente
 from logica.cargar_cliente import cargar_clientes
 from ui.registro_ui import crear_dialogo_agregar_cliente
-from utils import crear_campo_texto, crear_boton, actualizar_tabla
+from utils.utils import crear_campo_texto, crear_boton
 
 
 # ===============================================
 #  region LOGICA CLIENTE
 # ===============================================
+
+
+def manejar_seleccion(e):
+    # Obtener la fila seleccionada
+    fila_seleccionada = e.control  # Esto devuelve la instancia de DataRow seleccionada
+
+    # Alternar el estado de selección
+    fila_seleccionada.selected = not fila_seleccionada.selected
+    fila_seleccionada.update()  # Actualizar la fila en la interfaz
+
+    if fila_seleccionada.selected:  # Verificar si la fila está seleccionada
+        # Acceder al contenido de la primera celda (ID)
+        btn_eliminar.disabled = False
+        # id_seleccionado = fila_seleccionada.cells[0].content.value
+        # print(f"El ID es: {id_seleccionado}")
+    else:
+        print("Fila deseleccionada")
+    btn_eliminar.update()
 
 
 def validar_campos(nombre, contacto):
@@ -81,6 +99,7 @@ def cargar_clientes_en_tabla(e=None):
     clientes = cargar_clientes()
     lista_clientes.rows = [
         ft.DataRow(
+            on_select_changed=manejar_seleccion,
             cells=[
                 ft.DataCell(ft.Text(str(cliente["id"]))),
                 ft.DataCell(ft.Text(cliente["nombre"])),
@@ -107,7 +126,7 @@ txt_contacto = crear_campo_texto("Contacto", "Ej: +56912345678")
 txt_direccion = crear_campo_texto("Dirección", "Ej: Calle Principal #123")
 
 btn_eliminar = crear_boton(
-    "Eliminar", ft.icons.DELETE_FOREVER, eliminar_cliente_seleccionado, "red"
+    "Eliminar", ft.icons.PERSON_REMOVE, eliminar_cliente_seleccionado, "red"
 )
 btn_editar = crear_boton(
     "Editar", ft.icons.EDIT_SQUARE, editar_cliente_seleccionado, "yellow"
@@ -117,7 +136,8 @@ btn_actualizar = ft.IconButton(icon=ft.Icons.REPLAY, on_click=cargar_clientes_en
 
 
 lista_clientes = ft.DataTable(
-    data_row_color={ft.ControlState.PRESSED: "black"},
+    show_checkbox_column=True,
+    vertical_lines=ft.BorderSide(1, ft.Colors.GREY_300),
     columns=[
         ft.DataColumn(ft.Text("ID")),
         ft.DataColumn(ft.Text("Nombre")),
@@ -131,42 +151,6 @@ lista_clientes = ft.DataTable(
     # border_radius=4,
 )
 
-lista_clientes_2 = ft.DataTable(
-    width=700,
-    bgcolor="yellow",
-    border=ft.border.all(2, "red"),
-    border_radius=10,
-    vertical_lines=ft.border.BorderSide(3, "blue"),
-    horizontal_lines=ft.border.BorderSide(1, "green"),
-    sort_column_index=0,
-    sort_ascending=True,
-    heading_row_color=ft.Colors.BLACK12,
-    heading_row_height=100,
-    data_row_color={"hovered": "0x30FF0000"},
-    show_checkbox_column=True,
-    divider_thickness=0,
-    column_spacing=200,
-    columns=[
-        ft.DataColumn(
-            ft.Text("Column 1"),
-            on_sort=lambda e: print(f"{e.column_index}, {e.ascending}"),
-        ),
-        ft.DataColumn(
-            ft.Text("Column 2"),
-            tooltip="This is a second column",
-            numeric=True,
-            on_sort=lambda e: print(f"{e.column_index}, {e.ascending}"),
-        ),
-    ],
-    rows=[
-        ft.DataRow(
-            [ft.DataCell(ft.Text("A")), ft.DataCell(ft.Text("1"))],
-            selected=True,
-            on_select_changed=lambda e: print("row select changed:"),
-        ),
-        ft.DataRow([ft.DataCell(ft.Text("B")), ft.DataCell(ft.Text("2"))]),
-    ],
-)
 # ===============================================
 # FIN DE LOS ELEMENTOS
 # ===============================================
@@ -186,17 +170,9 @@ vista_clientes = ft.Container(
                         icon_color="gray",
                         width=100,
                         style=ft.ButtonStyle(bgcolor="#2196F3", color="white"),
-                        on_click=lambda e: crear_dialogo_agregar_cliente(
-                            e, actualizar_tabla
-                        ),
+                        on_click=lambda e: crear_dialogo_agregar_cliente(e),
                     ),
-                    ft.ElevatedButton(
-                        text="Eliminar",
-                        icon=ft.Icons.PERSON_REMOVE_ROUNDED,
-                        style=ft.ButtonStyle(bgcolor="red", color="white"),
-                        width=100,
-                        disabled=True,
-                    ),
+                    btn_eliminar,
                     ft.ElevatedButton(
                         text="Editar",
                         icon=ft.Icons.EDIT,

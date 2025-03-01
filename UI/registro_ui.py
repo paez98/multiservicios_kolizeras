@@ -1,5 +1,5 @@
 import flet as ft
-from utils import crear_campo_texto
+from utils.utils import crear_campo_texto
 from logica.crear_cliente import guardar_cliente
 # from ui.cliente_ui import cargar_clientes_en_tabla
 
@@ -50,16 +50,10 @@ def guardar_cliente_desde_dialogo(e, txt_nombre, txt_contacto, txt_direccion):
     e.page.overlay[-1].open = False  # Cierra el último diálogo en el overlay
     e.page.update()
     e.page.overlay.pop()
-    """
-      Hay una importacion circular, debo mover la funcion de cargar
-      los clientes al modulo de cargar clientes y asi ir modularizando
-      poco a poco el codigo
-    """
-    # Actualizar la tabla de clientes
     # cargar_clientes_en_tabla()
 
 
-def crear_dialogo_agregar_cliente(e, callback_actualizar_tabla):
+def crear_dialogo_agregar_cliente(e):
     """Crea y abre un diálogo modal para añadir un cliente."""
 
     def close_dlg(e):
