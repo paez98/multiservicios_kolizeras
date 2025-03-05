@@ -1,8 +1,9 @@
 import flet as ft
 
-from logica.eliminar_cliente import eliminar_cliente
+from logica.manejo_cliente import ManejoCliente
+
 from logica.editar_cliente import editar_cliente
-from logica.cargar_cliente import cargar_clientes
+
 from ui.registro_ui import crear_dialogo_agregar_cliente
 from utils.utils import crear_campo_texto, crear_boton
 
@@ -10,6 +11,7 @@ from utils.utils import crear_campo_texto, crear_boton
 # ===============================================
 #  region LOGICA CLIENTE
 # ===============================================
+manejo_cliente = ManejoCliente()
 
 
 def manejar_seleccion(e):
@@ -90,13 +92,13 @@ def eliminar_cliente_seleccionado(e):
     if not selected_id:
         print("No se ha seleccionado ningún cliente.")
         return
-    eliminar_cliente(selected_id)
+    manejo_cliente.eliminar_cliente(selected_id)
     cargar_clientes_en_tabla()
 
 
 def cargar_clientes_en_tabla(e=None):
     """Carga los clientes en la tabla."""
-    clientes = cargar_clientes()
+    clientes = manejo_cliente.cargar_clientes()
     lista_clientes.rows = [
         ft.DataRow(
             on_select_changed=manejar_seleccion,

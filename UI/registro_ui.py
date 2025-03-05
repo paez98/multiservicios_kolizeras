@@ -1,7 +1,9 @@
 import flet as ft
 from utils.utils import crear_campo_texto
-from logica.crear_cliente import guardar_cliente
-# from ui.cliente_ui import cargar_clientes_en_tabla
+from logica.manejo_cliente import ManejoCliente
+
+
+manejo_cliente = ManejoCliente()
 
 
 def limpiar_campos(txt_nombre, txt_contacto, txt_direccion):
@@ -37,7 +39,7 @@ def guardar_cliente_desde_dialogo(e, txt_nombre, txt_contacto, txt_direccion):
         return
 
     # Guardar el cliente
-    guardar_cliente(
+    manejo_cliente.guardar_cliente(
         txt_nombre.value.strip(),
         txt_contacto.value.strip(),
         txt_direccion.value.strip(),
@@ -50,7 +52,6 @@ def guardar_cliente_desde_dialogo(e, txt_nombre, txt_contacto, txt_direccion):
     e.page.overlay[-1].open = False  # Cierra el último diálogo en el overlay
     e.page.update()
     e.page.overlay.pop()
-    # cargar_clientes_en_tabla()
 
 
 def crear_dialogo_agregar_cliente(e):
