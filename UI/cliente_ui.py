@@ -1,9 +1,7 @@
 import flet as ft
 
 from logica.manejo_cliente import ManejoCliente
-
 from logica.editar_cliente import editar_cliente
-
 from ui.registro_ui import crear_dialogo_agregar_cliente
 from utils.utils import crear_campo_texto, crear_boton
 
@@ -28,6 +26,7 @@ def manejar_seleccion(e):
         # id_seleccionado = fila_seleccionada.cells[0].content.value
         # print(f"El ID es: {id_seleccionado}")
     else:
+        btn_eliminar.disabled = True
         print("Fila deseleccionada")
     btn_eliminar.update()
 
@@ -108,7 +107,7 @@ def cargar_clientes_en_tabla(e=None):
                 ft.DataCell(ft.Text(cliente["telefono"])),
                 ft.DataCell(ft.Text(cliente["direccion"])),
             ],
-            color="red",
+            # color="red",
         )
         for cliente in clientes
     ]
@@ -121,6 +120,48 @@ def cargar_clientes_en_tabla(e=None):
 
 
 # ===============================================
+# region DIALOGO DE CONFIRMACION
+# ===============================================
+def abrir_dialogo_confirmacion(e):
+    """Abre un diálogo modal de confirmación antes de eliminar un cliente."""
+
+    def confirmar_eliminacion(e):
+        """Confirma la eliminación del cliente."""
+        eliminar_cliente_seleccionado(e)
+        dialogo.open = False
+        e.page.update()
+
+    def cancelar_eliminacion(e):
+        """Cierra el diálogo sin eliminar."""
+        e.page.overlay[-1].open = False
+        e.page.update()
+        e.page.overlay.pop()
+
+    # Crear el diálogo modal de confirmación
+    dialogo = ft.AlertDialog(
+        modal=True,
+        title=ft.Text("Confirmar Eliminación", text_align="center", weight="bold"),
+        content=ft.Text("¿Estás seguro de que deseas eliminar este cliente?", size=30),
+        actions=[
+            ft.TextButton("Eliminar", on_click=confirmar_eliminacion),
+            ft.TextButton("Cancelar", on_click=cancelar_eliminacion),
+        ],
+        actions_alignment=ft.MainAxisAlignment.END,
+    )
+
+    # Abrir el diálogo
+    e.control.page.overlay.append(dialogo)
+    dialogo.open = True
+    btn_eliminar.disabled = True
+    e.control.page.update()
+
+
+# ===============================================
+# region DIALOGO DE EDICION DE CLIENTE
+# ===============================================
+
+
+# ===============================================
 # region ELEMENTOS INTERFAZ
 # ===============================================
 txt_nombre = crear_campo_texto("Nombre del cliente", "Ej: Alissa")
@@ -128,29 +169,32 @@ txt_contacto = crear_campo_texto("Contacto", "Ej: +56912345678")
 txt_direccion = crear_campo_texto("Dirección", "Ej: Calle Principal #123")
 
 btn_eliminar = crear_boton(
-    "Eliminar", ft.icons.PERSON_REMOVE, eliminar_cliente_seleccionado, "red"
+    "Eliminar", ft.icons.PERSON_REMOVE, abrir_dialogo_confirmacion, "red"
 )
-btn_editar = crear_boton(
-    "Editar", ft.icons.EDIT_SQUARE, editar_cliente_seleccionado, "yellow"
-)
+# btn_editar = crear_boton(
+#     "Editar", ft.icons.EDIT_SQUARE, abrir_dialogo_edicion_cliente, "yellow"
+# )
+
 
 btn_actualizar = ft.IconButton(icon=ft.Icons.REPLAY, on_click=cargar_clientes_en_tabla)
 
 
 lista_clientes = ft.DataTable(
     show_checkbox_column=True,
-    vertical_lines=ft.BorderSide(1, ft.Colors.GREY_300),
+    # vertical_lines=ft.BorderSide(1, ft.Colors.GREY_300),
     columns=[
         ft.DataColumn(ft.Text("ID")),
         ft.DataColumn(ft.Text("Nombre")),
         ft.DataColumn(ft.Text("Contacto")),
         ft.DataColumn(ft.Text("Dirección")),
     ],
-    show_bottom_border=True,
     rows=[],
     expand=True,
-    border=ft.border.all(2, ft.Colors.GREY_300),
-    # border_radius=4,
+    # border=ft.border.only(
+    #     left=ft.border.BorderSide(1, ft.Colors.GREY_300),
+    #     right=ft.border.BorderSide(1, ft.Colors.GREY_300),
+    #     bottom=ft.border.BorderSide(1, ft.Colors.GREY_300),
+    # ),
 )
 
 # ===============================================
@@ -163,9 +207,9 @@ lista_clientes = ft.DataTable(
 vista_clientes = ft.Container(
     content=ft.Column(
         controls=[
+            ft.Text("Clientes Registrados", size=25, weight="bold"),
             ft.Row(
                 [
-                    ft.Text("Clientes Registrados", size=25, weight="bold"),
                     ft.ElevatedButton(
                         text="Añadir",
                         icon=ft.Icons.PERSON_ADD,
@@ -178,23 +222,25 @@ vista_clientes = ft.Container(
                     ft.ElevatedButton(
                         text="Editar",
                         icon=ft.Icons.EDIT,
-                        style=ft.ButtonStyle(
-                            bgcolor="yellow",
-                            color="white",
-                        ),
                         width=100,
                         disabled=True,
                     ),
                     btn_actualizar,
-                ]
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
             ),
-            lista_clientes,
+            # ft.Divider(height=20),
+            ft.Container(
+                content=lista_clientes,
+                border=ft.border.all(1, ft.Colors.GREY_300),
+                border_radius=5,
+                padding=10,
+                expand=True,
+            ),
         ],
-        scroll=True,
+        horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
+        scroll=ft.ScrollMode.AUTO,
+        spacing=20,
         expand=True,
-    ),
-    border=ft.border.all(2, "#BBDEFB"),
-    alignment=ft.alignment.center,
-    expand=True,
-    padding=20,
+    )
 )
