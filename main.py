@@ -5,6 +5,7 @@ from ui.cliente_ui import cargar_clientes_en_tabla
 
 def main(page: ft.Page):
     # Configuración de la ventana
+    page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.bgcolor = ft.Colors.INDIGO_700
     page.title = "Taller Mecánico App"
     page.window_width = 1000
