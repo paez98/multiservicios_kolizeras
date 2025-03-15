@@ -1,0 +1,29 @@
+2025-03-15 00:16:10,441 - flet - INFO - Assets path configured: C:\Users\Paez\Documents\Proyectos Python\multiservicios_kolizeras\assets
+2025-03-15 00:16:10,442 - flet - INFO - Starting up TCP server on localhost:51580
+2025-03-15 00:16:10,447 - flet - INFO - Flet app has started...
+2025-03-15 00:16:10,633 - flet - INFO - App session started
+2025-03-15 00:16:11,426 - httpx - INFO - HTTP Request: GET https://phhaasmtuputcqrikdjw.supabase.co/rest/v1/clientes?select=%2A "HTTP/2 200 OK"
+2025-03-15 00:16:11,428 - ManejoCliente - INFO - Cargados 2 clientes
+2025-03-15 00:16:17,049 - ManejoCliente - WARNING - Nombre de cliente inválido
+2025-03-15 00:16:21,162 - httpx - INFO - HTTP Request: GET https://phhaasmtuputcqrikdjw.supabase.co/rest/v1/clientes?select=%2A "HTTP/2 200 OK"
+2025-03-15 00:16:21,170 - ManejoCliente - INFO - Cargados 2 clientes
+2025-03-15 00:16:21,543 - httpx - INFO - HTTP Request: GET https://phhaasmtuputcqrikdjw.supabase.co/rest/v1/clientes?select=%2A "HTTP/2 200 OK"
+2025-03-15 00:16:21,544 - ManejoCliente - INFO - Cargados 2 clientes
+2025-03-15 00:17:06,206 - ManejoCliente - WARNING - Teléfono de cliente inválido
+2025-03-15 00:17:17,517 - ManejoCliente - WARNING - Teléfono de cliente inválido
+2025-03-15 00:17:23,848 - httpx - INFO - HTTP Request: POST https://phhaasmtuputcqrikdjw.supabase.co/rest/v1/clientes "HTTP/2 201 Created"
+2025-03-15 00:17:23,849 - ManejoCliente - INFO - Cliente guardado ID: 46
+2025-03-15 00:17:26,756 - httpx - INFO - HTTP Request: GET https://phhaasmtuputcqrikdjw.supabase.co/rest/v1/clientes?select=%2A "HTTP/2 200 OK"
+2025-03-15 00:17:26,757 - ManejoCliente - INFO - Cargados 3 clientes
+2025-03-15 00:18:16,566 - httpx - INFO - HTTP Request: GET https://phhaasmtuputcqrikdjw.supabase.co/rest/v1/clientes?select=id&id=eq.43 "HTTP/2 200 OK"
+2025-03-15 00:18:16,739 - httpx - INFO - HTTP Request: DELETE https://phhaasmtuputcqrikdjw.supabase.co/rest/v1/clientes?id=eq.43 "HTTP/2 200 OK"
+2025-03-15 00:18:16,740 - ManejoCliente - INFO - Cliente eliminado ID: 43
+2025-03-15 00:18:16,896 - httpx - INFO - HTTP Request: GET https://phhaasmtuputcqrikdjw.supabase.co/rest/v1/clientes?select=%2A "HTTP/2 200 OK"
+2025-03-15 00:18:16,896 - ManejoCliente - INFO - Cargados 2 clientes
+2025-03-15 00:18:21,198 - httpx - INFO - HTTP Request: GET https://phhaasmtuputcqrikdjw.supabase.co/rest/v1/clientes?select=%2A "HTTP/2 200 OK"
+2025-03-15 00:18:21,199 - ManejoCliente - INFO - Cargados 2 clientes
+2025-03-15 00:18:24,139 - httpx - INFO - HTTP Request: GET https://phhaasmtuputcqrikdjw.supabase.co/rest/v1/clientes?select=id&id=eq.44 "HTTP/2 200 OK"
+2025-03-15 00:18:24,297 - httpx - INFO - HTTP Request: DELETE https://phhaasmtuputcqrikdjw.supabase.co/rest/v1/clientes?id=eq.44 "HTTP/2 200 OK"
+2025-03-15 00:18:24,298 - ManejoCliente - INFO - Cliente eliminado ID: 44
+2025-03-15 00:18:24,391 - httpx - INFO - HTTP Request: GET https://phhaasmtuputcqrikdjw.supabase.co/rest/v1/clientes?select=%2A "HTTP/2 200 OK"
+2025-03-15 00:18:24,391 - ManejoCliente - INFO - Cargados 1 clientes

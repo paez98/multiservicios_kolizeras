@@ -1,5 +1,5 @@
 import flet as ft
-from datetime import datetime
+
 
 # ===============================================
 #     ELEMENTOS DE LA INTERFAZ DE PAGOS
@@ -12,9 +12,9 @@ dd_cliente = ft.Dropdown(
     options=[
         ft.dropdown.Option("Juan Pérez"),
         ft.dropdown.Option("María García"),
-        ft.dropdown.Option("Carlos Martínez")
+        ft.dropdown.Option("Carlos Martínez"),
     ],
-    border_color="#9C27B0"
+    border_color="#9C27B0",
 )
 
 dd_servicio = ft.Dropdown(
@@ -23,9 +23,9 @@ dd_servicio = ft.Dropdown(
     options=[
         ft.dropdown.Option("Cambio de aceite"),
         ft.dropdown.Option("Alineación"),
-        ft.dropdown.Option("Frenos")
+        ft.dropdown.Option("Frenos"),
     ],
-    border_color="#9C27B0"
+    border_color="#9C27B0",
 )
 
 txt_monto = ft.TextField(
@@ -33,18 +33,15 @@ txt_monto = ft.TextField(
     width=200,
     border_color="#9C27B0",
     prefix_text="$",
-    hint_text="Ej: 150.000"
+    hint_text="Ej: 150.000",
 )
 
 # Botón de registro de pago
 btn_registrar_pago = ft.ElevatedButton(
     text="Registrar Pago",
     icon=ft.icons.PAYMENT,
-    style=ft.ButtonStyle(
-        bgcolor="#9C27B0",
-        color="white"
-    ),
-    width=200
+    style=ft.ButtonStyle(bgcolor="#9C27B0", color="white"),
+    width=200,
 )
 
 # Tabla de pagos
@@ -67,7 +64,7 @@ tabla_pagos = ft.DataTable(
             ]
         )
     ],
-    expand=True
+    expand=True,
 )
 
 # Contenedor principal de pagos
@@ -76,14 +73,9 @@ pago_container = ft.Container(
         controls=[
             ft.Text("Registro de Pagos", size=25, color="#9C27B0"),
             ft.Row(
-                controls=[
-                    dd_cliente,
-                    dd_servicio,
-                    txt_monto,
-                    btn_registrar_pago
-                ],
+                controls=[dd_cliente, dd_servicio, txt_monto, btn_registrar_pago],
                 spacing=20,
-                alignment=ft.MainAxisAlignment.CENTER
+                alignment=ft.MainAxisAlignment.CENTER,
             ),
             ft.Divider(height=20),
             ft.Container(
@@ -92,12 +84,13 @@ pago_container = ft.Container(
                 border_radius=10,
                 padding=10,
                 expand=True,
-                alignment=ft.alignment.top_center
-            )
+            ),
         ],
+        horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
+        scroll=True,
         spacing=20,
-        expand=True
+        expand=True,
     ),
     padding=20,
-    expand=True
+    expand=True,
 )

@@ -17,7 +17,7 @@ tabs = ft.Tabs(
         ft.Tab(
             text="Clientes",
             icon=ft.Icons.PEOPLE_ALT,
-            content=ft.Container(vista_clientes),
+            content=vista_clientes,
         ),
         ft.Tab(
             text="Servicios",
@@ -30,5 +30,6 @@ tabs = ft.Tabs(
             content=pago_container,
         ),
     ],
+    padding=50,
     expand=1,
 )

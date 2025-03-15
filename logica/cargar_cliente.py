@@ -1,32 +1,11 @@
 from client_supabase import supabase
 
 
-def cargar_clientes():
-    """Carga los clientes desde Supabase."""
-    try:
-        response = supabase.table("clientes").select("*").execute()
-        return response.data
-    except Exception as e:
-        print(f"Error al cargar los clientes{e}")
-        return []
-
-
-# Logica para cargar clientes desde postgre
-# from models.cliente import Cliente
-# cliente = Cliente()
 # def cargar_clientes():
-#     """Carga los clientes desde la base de datos."""
+#     """Carga los clientes desde Supabase."""
 #     try:
-#         clientes = Cliente.cargar_todos()
-#         return [
-#             {
-#                 "id": c.id,
-#                 "nombre": c.nombre,
-#                 "telefono": c.telefono,
-#                 "direccion": c.direccion,
-#             }
-#             for c in clientes
-#         ]
+#         response = supabase.table("clientes").select("*").execute()
+#         return response.data
 #     except Exception as e:
-#         print(f"Error al cargar los clientes: {e}")
+#         print(f"Error al cargar los clientes{e}")
 #         return []
