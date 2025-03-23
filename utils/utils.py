@@ -1,10 +1,15 @@
 import flet as ft
+from typing import Optional
 
 
-def crear_campo_texto(label, hint_text):
+def crear_campo_texto(label, hint_text: Optional[str] = None):
     "Crea un campo de texto estilizado"
     return ft.TextField(
-        label=label, width=300, border_color="#2196f3", hint_text=hint_text
+        label=label,
+        width=300,
+        border_color="#2196f3",
+        hint_text=hint_text,
+        border="underline",
     )
 
 

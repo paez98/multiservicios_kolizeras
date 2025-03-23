@@ -6,25 +6,25 @@ from logica.manejo_cliente import ManejoCliente
 manejo_cliente = ManejoCliente()
 
 
-def limpiar_campos(txt_nombre, txt_contacto, txt_direccion):
-    """Limpia los campos del diálogo."""
-    txt_nombre.value = ""
-    txt_contacto.value = ""
-    txt_direccion.value = ""
-    txt_nombre.error_text = ""
-    txt_contacto.error_text = ""
-    txt_nombre.update()
-    txt_contacto.update()
-    txt_direccion.update()
+# def limpiar_campos(txt_nombre, txt_contacto, txt_direccion):
+#     """Limpia los campos del diálogo."""
+#     txt_nombre.value = ""
+#     txt_contacto.value = ""
+#     txt_direccion.value = ""
+#     txt_nombre.error_text = ""
+#     txt_contacto.error_text = ""
+#     txt_nombre.update()
+#     txt_contacto.update()
+#     txt_direccion.update()
 
 
-def validar_campos(nombre, contacto):
+def validar_campos(nombre: str, contacto: str):
     """Valida los campos obligatorios."""
     errores = {}
-    if not nombre:
-        errores["nombre"] = "Campo obligatorio"
-    if not contacto:
-        errores["contacto"] = "Campo obligatorio"
+    if not nombre.strip() or len(nombre) < 5:
+        errores["nombre"] = "Nombre invalido"
+    if not contacto.strip().isdigit() or len(contacto.strip()) < 8:
+        errores["contacto"] = "telefono invalido"
     return errores
 
 
@@ -46,7 +46,7 @@ def guardar_cliente_desde_dialogo(e, txt_nombre, txt_contacto, txt_direccion):
     )
 
     # Limpiar los campos
-    limpiar_campos(txt_nombre, txt_contacto, txt_direccion)
+    # limpiar_campos(txt_nombre, txt_contacto, txt_direccion)
 
     # Cerrar el diálogo
     e.page.overlay[-1].open = False  # Cierra el último diálogo en el overlay

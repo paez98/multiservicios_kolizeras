@@ -24,7 +24,7 @@ class ManejoCliente:
                 )
                 .execute()
             )
-            print(f"Cliente guardado exitosamente{response}")
+            print(f"Cliente guardado exitosamente {response}")
             return response.data
         except Exception as e:
             print(f"Error al guardar el cliente: {e}")
@@ -36,12 +36,13 @@ class ManejoCliente:
             response = (
                 supabase.table(self.table_name)
                 .update(
-                    {"nombre": nombre, "telefono": telefono, "direccion": direccion}
+                    {"nombre": nombre, "telefono": telefono, "direccion": direccion},
+                    returning="representation",
                 )
                 .eq("id", cliente_id)
                 .execute()
             )
-            print(f"Cliente editado exitosamente{response}")
+            print(f"Cliente editado exitosamente {response.data}")
             return response.data
         except Exception as e:
             print(f"Error al editar el cliente: {e}")

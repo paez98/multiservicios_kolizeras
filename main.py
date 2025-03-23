@@ -1,6 +1,12 @@
 import flet as ft
 from tabs import tabs
-from ui.cliente_ui import cargar_clientes_en_tabla
+from ui.cliente_ui import _cargar_clientes
+from logica.manejo_cliente import ManejoCliente
+from faker import Faker
+
+# from ui.cliente_ui import cargar_clientes_en_tabla
+majeo = ManejoCliente()
+fake = Faker()
 
 
 def main(page: ft.Page):
@@ -10,11 +16,10 @@ def main(page: ft.Page):
     page.window_width = 1000
     page.window_height = 600
     page.window_resizable = True  # Permite redimensionar
-    page.bgcolor = "#1e1e1e"
-
+    page.theme_mode = ft.ThemeMode.DARK
+    # page.bgcolor = "#1e1e1e"
     page.add(tabs)
-
-    cargar_clientes_en_tabla()
+    page.update()
 
 
 if __name__ == "__main__":

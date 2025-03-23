@@ -27,3 +27,21 @@
 2025-03-15 00:18:24,298 - ManejoCliente - INFO - Cliente eliminado ID: 44
 2025-03-15 00:18:24,391 - httpx - INFO - HTTP Request: GET https://phhaasmtuputcqrikdjw.supabase.co/rest/v1/clientes?select=%2A "HTTP/2 200 OK"
 2025-03-15 00:18:24,391 - ManejoCliente - INFO - Cargados 1 clientes
+2025-03-16 15:20:10,980 - flet - INFO - Assets path configured: C:\Users\Paez\Documents\Proyectos Python\multiservicios_kolizeras\assets
+2025-03-16 15:20:10,989 - flet - INFO - Starting up TCP server on localhost:51561
+2025-03-16 15:20:10,994 - flet - INFO - Flet app has started...
+2025-03-16 15:20:11,215 - flet - INFO - App session started
+2025-03-16 15:20:12,036 - httpx - INFO - HTTP Request: GET https://phhaasmtuputcqrikdjw.supabase.co/rest/v1/clientes?select=%2A "HTTP/2 200 OK"
+2025-03-16 15:20:12,039 - ManejoCliente - INFO - Cargados 7 clientes
+2025-03-16 15:21:21,485 - flet - INFO - Assets path configured: C:\Users\Paez\Documents\Proyectos Python\multiservicios_kolizeras\assets
+2025-03-16 15:21:21,487 - flet - INFO - Starting up TCP server on localhost:51574
+2025-03-16 15:21:21,492 - flet - INFO - Flet app has started...
+2025-03-16 15:21:21,658 - flet - INFO - App session started
+2025-03-16 15:21:22,164 - httpx - INFO - HTTP Request: GET https://phhaasmtuputcqrikdjw.supabase.co/rest/v1/clientes?select=%2A "HTTP/2 200 OK"
+2025-03-16 15:21:22,167 - ManejoCliente - INFO - Cargados 7 clientes
+2025-03-16 15:22:14,058 - flet - INFO - Assets path configured: C:\Users\Paez\Documents\Proyectos Python\multiservicios_kolizeras\assets
+2025-03-16 15:22:14,060 - flet - INFO - Starting up TCP server on localhost:51581
+2025-03-16 15:22:14,065 - flet - INFO - Flet app has started...
+2025-03-16 15:22:14,225 - flet - INFO - App session started
+2025-03-16 15:22:14,837 - httpx - INFO - HTTP Request: GET https://phhaasmtuputcqrikdjw.supabase.co/rest/v1/clientes?select=%2A "HTTP/2 200 OK"
+2025-03-16 15:22:14,840 - ManejoCliente - INFO - Cargados 7 clientes
