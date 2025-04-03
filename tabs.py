@@ -1,18 +1,24 @@
 import flet as ft
 
+
 from ui.cliente_ui import vista_clientes, _cargar_clientes, cliente_state
-from servicios import lista_servicios
+from ui.servicios import lista_servicios, _cargar_servicio, servicio_state
 from home import home
-from pago import pago_container
+from ui.pago import vista_pagos
 
 clientes_cargados = False
+servicios_cargados = False
 
 
-def cargar_clientes_pestana(e):
-    global clientes_cargados
-    if e.control.selected_index == 1 and not clientes_cargados:
+def cargar_datos_pestana(e):
+    global clientes_cargados, servicios_cargados
+    tab_index = e.control.selected_index
+    if tab_index == 1 and not clientes_cargados:
         _cargar_clientes(e, cliente_state)
         clientes_cargados = True
+    elif tab_index == 2 and not servicios_cargados:
+        _cargar_servicio(e, servicio_state)
+        servicios_cargados = True
 
 
 tabs = ft.Tabs(
@@ -32,12 +38,14 @@ tabs = ft.Tabs(
         ),
         ft.Tab(
             text="Pago",
-
             icon=ft.Icons.ATTACH_MONEY,
-            content=pago_container,
+            content=vista_pagos,
         ),
     ],
-    on_change=cargar_clientes_pestana,
-    padding=50,
+    on_change=cargar_datos_pestana,
+    tab_alignment=ft.TabAlignment.CENTER,
+    padding=200,
     expand=1,
+    unselected_label_color=ft.Colors.GREY_800,
+    scrollable=True,
 )

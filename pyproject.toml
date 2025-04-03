@@ -1,0 +1,13 @@
+[project]
+name = "multiservicios-kolizeras"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.13, <3.14"
+dependencies = [
+    "dotenv",
+    "flet~=0.27.1",
+    "psycopg2-binary~=2.9.10",
+    "python>=3.13",
+    "python-dotenv~=1.0.1",
+    "supabase~=2.13.0",
+]
