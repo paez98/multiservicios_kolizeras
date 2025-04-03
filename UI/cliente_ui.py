@@ -1,8 +1,7 @@
 import flet as ft
-from typing import Optional
 from logica.manejo_cliente import ManejoCliente
 from ui.registro_ui import crear_dialogo_agregar_cliente
-from utils.utils import crear_campo_texto, crear_boton
+from utils.utils import crear_boton, DialogHandler
 
 
 # ===============================================
@@ -11,14 +10,14 @@ from utils.utils import crear_campo_texto, crear_boton
 class ClienteUIState:
     def __init__(self):
         # Componentes de la interfaz
-        self.txt_nombre = crear_campo_texto("Nombre del cliente", "Ej: Alissa")
-        self.txt_contacto = crear_campo_texto("Contacto", "Ej: +56912345678")
-        self.txt_direccion = crear_campo_texto("Dirección", "Ej: Calle Principal #123")
+        # self.txt_nombre = crear_campo_texto("Nombre del cliente", "Ej: Alissa")
+        # self.txt_contacto = crear_campo_texto("Contacto", "Ej: +56912345678")
+        # self.txt_direccion = crear_campo_texto("Dirección", "Ej: Calle Principal #123")
 
         # Botones
-        self.btn_eliminar = crear_boton("Eliminar", ft.icons.PERSON_REMOVE, None, "red")
+        self.btn_eliminar = crear_boton("Eliminar", ft.Icons.PERSON_REMOVE, None, "red")
         self.btn_agregar = crear_boton("Añadir", ft.Icons.PERSON_ADD, None, "green")
-        self.btn_editar = crear_boton("Editar", ft.icons.EDIT_SQUARE, None, "yellow")
+        self.btn_editar = crear_boton("Editar", ft.Icons.EDIT_SQUARE, None, "yellow")
         self.btn_actualizar = ft.IconButton(icon=ft.Icons.REPLAY, on_click=None)
 
         # DataTable Clientes
@@ -32,76 +31,25 @@ class ClienteUIState:
             ],
             rows=[],
             expand=True,
+            border=ft.border.all(1, ft.Colors.GREY_300),
         )
         # Dependencias
         self.manejo_cliente = ManejoCliente()
-
-
-# region DIALOGO
-# ===============================================
-# 2. CLASE PARA DIALOGOS (REUTILIZABLE)
-# ===============================================
-class DialogHandler:
-    @staticmethod
-    def crear_dialogo_confirmacion(page, titulo: str, mensaje: str, on_confirm):
-        def cerrar_dialogo(e):
-            e.page.overlay[-1].open = False
-            e.page.update()
-            e.page.overlay.pop()
-
-        dialogo = ft.AlertDialog(
-            modal=True,
-            title=ft.Text(titulo),
-            content=ft.Text(mensaje),
-            actions=[
-                ft.TextButton("Confirmar", on_click=on_confirm),
-                ft.TextButton("Cancelar", on_click=cerrar_dialogo),
-            ],
-        )
-        page.overlay.append(dialogo)
-        dialogo.open = True
-        page.update()
-
-    @staticmethod
-    def crear_dialogo_edicion(page, on_edit: Optional[any] = None):
-        def cerrar_dialogo(e):
-            e.page.overlay[-1].open = False
-            e.page.update()
-            e.page.overlay.pop()
-
-        dialogo = ft.AlertDialog(
-            modal=True,
-            title=ft.Text("Editar cliente"),
-            content=ft.Column(
-                controls=[
-                    ft.TextField(label="Nombre", border="underline"),
-                    ft.TextField(label="Contacto", border="underline"),
-                    ft.TextField(label="Direccion", border="underline"),
-                ]
-            ),
-            actions=[
-                ft.TextButton("Confirmar", on_click=on_edit),
-                ft.TextButton("Cancelar", on_click=cerrar_dialogo),
-            ],
-        )
-        page.overlay.append(dialogo)
-        dialogo.open = True
-        page.update()
 
 
 # ===============================================
 # 3. VALIDACIONES CENTRALIZADAS
 # ===============================================
 # region VALIDACION
-class ValidadorCliente:
-    @staticmethod
-    def validar(nombre: str, contacto: str) -> dict:
-        errores = {}
-        if len(nombre.strip()) < 3:
-            errores["nombre"] = "Mínimo 3 caracteres"
-        if not contacto.strip().isdigit() or len(contacto.strip()) < 8:
-            errores["contacto"] = "Teléfono inválido"
-        return errores
+# class ValidadorCliente:
+#     @staticmethod
+#     def validar(nombre: str, contacto: str) -> dict:
+#         errores = {}
+#         if len(nombre.strip()) < 3:
+#             errores["nombre"] = "Mínimo 3 caracteres"
+#         if not contacto.strip().isdigit() or len(contacto.strip()) < 8:
+#             errores["contacto"] = "Teléfono inválido"
+#         return errores
 
 
 # ===============================================
@@ -111,7 +59,7 @@ class ValidadorCliente:
 def setup_cliente_ui(state: ClienteUIState):
     # Configurar eventos
     state.btn_eliminar.on_click = lambda e: _eliminar_cliente(e, state)
-    state.btn_editar.on_click = lambda e: edit(e)
+    state.btn_editar.on_click = lambda e: edit(e, state)
     state.btn_actualizar.on_click = lambda e: _cargar_clientes(e, state)
     state.btn_agregar.on_click = lambda e: crear_dialogo_agregar_cliente(e)
     state.btn_agregar.disabled = False
@@ -146,7 +94,7 @@ def setup_cliente_ui(state: ClienteUIState):
                     scroll=ft.ScrollMode.AUTO,
                     horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
                 ),
-                border=ft.border.all(1, "#E1BEE7"),
+                # border=ft.border.all(1, "#E1BEE7"),
                 border_radius=10,
                 padding=10,
                 expand=True,
@@ -168,7 +116,7 @@ def _cargar_clientes(e, state: ClienteUIState):
         state.lista_clientes.rows = [
             ft.DataRow(
                 cells=[
-                    ft.DataCell(ft.Text(str(cliente["id"]))),
+                    ft.DataCell(ft.Text(str(cliente.get("id")))),
                     ft.DataCell(ft.Text(cliente["nombre"])),
                     ft.DataCell(ft.Text(cliente["telefono"])),
                     ft.DataCell(ft.Text(cliente["direccion"])),
@@ -187,19 +135,17 @@ def _manejar_seleccion(e, state: ClienteUIState):
     fila = e.control
     fila.selected = not fila.selected
     fila.update()
-
-    state.btn_eliminar.disabled = not fila.selected
-    state.btn_editar.disabled = not fila.selected
-    if state.lista_clientes.rows is None:
-        state.btn_eliminar.disabled = True
-        state.btn_eliminar.update()
+    hay_seleccion = any(row.selected for row in state.lista_clientes.rows)
+    print(hay_seleccion)
+    state.btn_editar.disabled = not hay_seleccion
+    state.btn_eliminar.disabled = not hay_seleccion
     state.btn_eliminar.update()
     state.btn_editar.update()
 
 
 def _eliminar_cliente(e, state: ClienteUIState):
     """Maneja todo el proceso de eliminación de un cliente"""
-    cliente_id = _obtener_id_seleccionado(state)
+    cliente_id = obtener_datos(state, True)
 
     if not cliente_id:
         print("Ningún cliente seleccionado")
@@ -222,51 +168,42 @@ def _eliminar_cliente(e, state: ClienteUIState):
     )
 
 
-def _obtener_id_seleccionado(state: ClienteUIState):
+def obtener_datos(state: ClienteUIState, solo_id: bool = False):
     for row in state.lista_clientes.rows:
         if row.selected:
-            a = {
-                "Id": row.cells[0].content.value,
-                "Nombre": row.cells[1].content.value,
-                "Telefono": row.cells[2].content.value,
-                "Direccion": row.cells[3].content.value,
-            }
-            print(a)
-            return row.cells[0].content.value
-
+            if solo_id:  # Modo eliminación
+                return row.cells[0].content.value
+            else:  # Modo edición
+                return {
+                    "Id": row.cells[0].content.value,
+                    "Nombre": row.cells[1].content.value,
+                    "Telefono": row.cells[2].content.value,
+                    "Direccion": row.cells[3].content.value,
+                }
     return None
 
 
-def obtener_datos(state: ClienteUIState):
-    for row in state.lista_clientes.rows:
-        if row.selected:
-            data = {
-                "Id": row.cells[0].content.value,
-                "Nombre": row.cells[1].content.value,
-                "Telefono": row.cells[2].content.value,
-                "Direccion": row.cells[3].content.value,
-            }
-            return data
-    return None
+def edit(e, state: ClienteUIState):
+    cliente_data = obtener_datos(state)
+    if not cliente_data:
+        print("Ningún cliente seleccionado")
+        return
 
+    def guardar_cambios(datos_actualizados):
+        try:
+            state.manejo_cliente.editar_cliente(
+                datos_actualizados["id"],
+                datos_actualizados["nombre"],
+                datos_actualizados["telefono"],
+                datos_actualizados["direccion"],
+            )
+            _cargar_clientes(e, state)  # Refrescar la tabla
+        except Exception as error:
+            print(f"Error al editar cliente: {error}")
 
-def edit(e):
-    # cliente_data = obtener_datos(state)
-    # if not cliente_data:
-    #     print("Ningún cliente seleccionado")
-    #     return
-    DialogHandler.crear_dialogo_edicion(e.page)
-    # def guardar_cambios(datos_actualizados):
-    #     try:
-    #         state.manejo_cliente.editar_cliente(
-    #             datos_actualizados["id"],
-    #             datos_actualizados["nombre"],
-    #             datos_actualizados["telefono"],
-    #             datos_actualizados["direccion"],
-    #         )
-    #         _cargar_clientes(e, state)  # Refrescar la tabla
-    #     except Exception as error:
-    #         print(f"Error al editar cliente: {error}")
+    DialogHandler.crear_dialogo_edicion(
+        e.page, cliente_data=cliente_data, on_edit=guardar_cambios
+    )
 
 
 # DESHACER LOS CAMBIOS PARA LA EDICION DE CLIENTES YA QUE HAY ERRORES
