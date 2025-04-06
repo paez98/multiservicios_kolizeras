@@ -1,3 +1,4 @@
+# Este archivo actualmente no esta activo pero se conservaa para futuros usos
 from database import Conexion
 
 

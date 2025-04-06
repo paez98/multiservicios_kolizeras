@@ -4,11 +4,31 @@ from client_supabase import supabase
 class ManejoCliente:
     def __init__(self):
         self.table_name = "clientes"
+        self.db_client = supabase
 
     def cargar_clientes(self):
         """Carga los clientes desde la base de datos"""
         try:
-            response = supabase.table(self.table_name).select("*").execute()
+            response = (
+                self.db_client.table(self.table_name)
+                .select("*")
+                .order("id", desc=False)
+                .execute()
+            )
+            return response.data
+        except Exception as e:
+            print(f"Error al cargar los clientes{e}")
+            return []
+
+    def cargar_nombre_clientes(self):
+        """Carga los clientes desde la base de datos"""
+        try:
+            response = (
+                supabase.table(self.table_name)
+                .select("nombre")
+                .order("id", desc=False)
+                .execute()
+            )
             return response.data
         except Exception as e:
             print(f"Error al cargar los clientes{e}")
@@ -24,7 +44,7 @@ class ManejoCliente:
                 )
                 .execute()
             )
-            print(f"Cliente guardado exitosamente{response}")
+            print(f"Cliente guardado exitosamente {response}")
             return response.data
         except Exception as e:
             print(f"Error al guardar el cliente: {e}")
@@ -36,12 +56,13 @@ class ManejoCliente:
             response = (
                 supabase.table(self.table_name)
                 .update(
-                    {"nombre": nombre, "telefono": telefono, "direccion": direccion}
+                    {"nombre": nombre, "telefono": telefono, "direccion": direccion},
+                    returning="representation",
                 )
                 .eq("id", cliente_id)
                 .execute()
             )
-            print(f"Cliente editado exitosamente{response}")
+            print(f"Cliente editado exitosamente {response.data}")
             return response.data
         except Exception as e:
             print(f"Error al editar el cliente: {e}")
