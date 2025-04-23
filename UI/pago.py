@@ -1,9 +1,12 @@
 import datetime
 import flet as ft
-from utils.utils import crear_campo_texto, crear_boton
+from logica.logica_pago import LogicaPago
 from logica.manejo_cliente import ManejoCliente
 from logica.manejo_servicio import ManejoServicio
+from ui.registro_ui import manejo_pago
 from ui.servicios import ServicioUiState
+
+
 # ===============================================
 #     ELEMENTOS DE LA INTERFAZ DE PAGOS
 # ===============================================
@@ -14,7 +17,7 @@ class PagoUiState:
         # Logica pagos
         self.manejo_cliente = ManejoCliente()
         self.manejo_servicio = ManejoServicio()
-
+        self.manejo_pago = LogicaPago()
         # DropDown Components
 
         self.tittle = ft.Text(
@@ -23,16 +26,27 @@ class PagoUiState:
             size=30,
             color="#9C27B0",
         )
+        self.txt_monto = ft.TextField(
+            label="Monto",
+            read_only=True,
+            width=200,
+            col={"sm": 6, "lg": 1.5},
+        )
+
+        self.txt_fecha = ft.TextField(
+            label="Fecha",
+            # value=str(datetime.date.today()),
+            read_only=True,
+            width=200,
+            col={"sm": 12, "lg": 1.5},
+        )
         self.dd_cliente = ft.Dropdown(
             enable_filter=True,
             editable=True,
             label="Cliente",
             width=250,
-            options=[
-                ft.dropdown.Option(cliente["nombre"])
-                for cliente in self.manejo_cliente.cargar_nombre_clientes()
-            ],
-            col={"sm": 12, "lg": 2},
+            options=[],
+            col={"sm": 12, "lg": 1.5},
             border_color="#9C27B0",
         )
 
@@ -41,24 +55,24 @@ class PagoUiState:
             editable=True,
             label="Servicio",
             width=250,
-            options=[
-                # ft.dropdown.Option(servicio["descripcion"])
-                # for servicio in self.manejo_servicio.cargar_servicios()
-            ],
+            options=[],
             border_color="#9C27B0",
-            col={"sm": 12, "lg": 2},
+            col={"sm": 12, "lg": 1.5},
         )
 
         # Seleccion de fecha
-        self.fecha_de_pago = ft.DatePicker(current_date=datetime.date.today())
+        self.fecha_de_pago = ft.DatePicker(
+            current_date=datetime.date.today(),
+            on_change=lambda e: self._seleccionar_fecha(e),
+        )
         self.btn_fecha = ft.ElevatedButton(
-            "Seleccionar Fecha",
-            icon=ft.icons.DATE_RANGE,
+            "Fecha",
+            icon=ft.Icons.DATE_RANGE,
             on_click=self._abrir_date_picker,
-            col={"sm": 12, "lg": 2},
+            col={"sm": 12, "lg": 1.5},
             style=ft.ButtonStyle(
-                bgcolor=ft.colors.PURPLE_300,
-                padding=ft.padding.all(20),
+                bgcolor=ft.Colors.PURPLE_300,
+                padding=ft.padding.all(10),
             ),
         )
 
@@ -66,10 +80,27 @@ class PagoUiState:
             text="Registrar Pago",
             icon=ft.Icons.PAYMENT,
             style=ft.ButtonStyle(
-                bgcolor=ft.colors.PURPLE_300,
-                padding=ft.padding.all(20),
+                bgcolor=ft.Colors.PURPLE_300,
+                padding=ft.padding.all(10),
             ),
-            col={"sm": 12, "lg": 2},
+            on_click=lambda e: self._registrar_pago(
+                self.dd_cliente.value,
+                self.dd_servicio.value,
+                self.txt_monto.value.strip(),
+                self.txt_fecha.value.strip(),
+            ),
+            # on_click= lambda  e: manejo_pago.guardar_pago(self.dd_cliente.value,self.dd_servicio.value, self.txt_monto.value,self.txt_fecha.value.strip()),
+            col={"sm": 12, "lg": 1.5},
+        )
+
+        self.btn_actualizar = ft.ElevatedButton(
+            text="Refresh",
+            icon=ft.Icons.REPLAY,
+            style=ft.ButtonStyle(
+                bgcolor=ft.Colors.PURPLE_300,
+                padding=ft.padding.all(10),
+            ),
+            col={"sm": 12, "lg": 1.5},
         )
         # DataTable de pagos
         self.lista_de_pago = ft.DataTable(
@@ -83,36 +114,49 @@ class PagoUiState:
             expand=True,
             border=ft.border.all(1, ft.Colors.GREY_300),
         )
-
-        self.txt_monto = ft.TextField(
-            label="Monto",
-            read_only=True,
-            width=200,
-            col={"sm": 12, "lg": 2},
-        )
-        self.txt_fecha = ft.TextField(
-            label="Fecha",
-            # value=str(datetime.date.today()),
-            read_only=True,
-            width=200,
-            col={"sm": 12, "lg": 2},
-        )
-
+        self._cargar_clientes_dropdown()
         self._cargar_servicios_dropdown()
+
+    # region METODOS
+    def _registrar_pago(self, nombre, servicio, monto, fecha):
+        manejo_pago.guardar_pago(nombre, servicio, monto, fecha)
+
+        self.dd_cliente.value = ""
+        self.dd_servicio.value = ""
+        self.txt_fecha.value = ""
+        self.txt_monto.value = ""
+
+        self.txt_monto.update()
+        self.dd_servicio.update()
+        self.dd_cliente.update()
+        self.txt_fecha.update()
 
     def _abrir_date_picker(self, e):
         """Abre el selector de fecha"""
         e.control.page.open(self.fecha_de_pago)
 
+    def _seleccionar_fecha(self, e):
+        self.txt_fecha.value = f"{self.fecha_de_pago.value.strftime('%d-%m-%Y')}"
+
+        e.control.page.update()
+
     def _cargar_servicios_dropdown(self):
         servicios = self.manejo_servicio.cargar_servicios()
         self.dd_servicio.options = [
             ft.dropdown.Option(
-                print(servicio),
                 text=servicio["descripcion"],
                 data=servicio["precio"],  # Almacenamos el precio en el data
             )
             for servicio in servicios
+        ]
+
+    def _cargar_clientes_dropdown(self):
+        clientes = self.manejo_cliente.cargar_clientes()
+        self.dd_cliente.options = [
+            ft.dropdown.Option(
+                text=cliente["nombre"],
+            )
+            for cliente in clientes
         ]
 
     def actualizar_monto_servicio(self, e):
@@ -129,10 +173,43 @@ class PagoUiState:
             self.txt_monto.update()
 
 
+# region LOGICA
+
+
+def _cargar_pagos(e, state: PagoUiState):
+    try:
+        pagos = state.manejo_pago.cargar_pagos()
+        state.lista_de_pago.rows = [
+            ft.DataRow(
+                cells=[
+                    ft.DataCell(ft.Text(pago["nombre"])),
+                    ft.DataCell(ft.Text(pago["servicio"])),
+                    ft.DataCell(ft.Text(pago["monto"])),
+                    ft.DataCell(ft.Text(pago["fecha"])),
+                ]
+            )
+            for pago in pagos
+        ]
+        state.lista_de_pago.update()
+    except Exception as e:
+        print(f"Error al cargar los pagos {e}")
+
+
+def _actualizar_todo(e, state: PagoUiState):
+    _cargar_pagos(e, state)
+    state.lista_de_pago.update()
+    state._cargar_servicios_dropdown()
+    state.dd_servicio.update()
+    state._cargar_clientes_dropdown()
+    state.dd_cliente.update()
+
+
 # region VISTA
 def setup_pagos_ui(state: PagoUiState) -> ft.Control:
     """Retorna la interfaz grafica de la seccion de Pago"""
+
     state.dd_servicio.on_change = state.actualizar_monto_servicio
+    state.btn_actualizar.on_click = lambda e: _actualizar_todo(e, state)
     return ft.Column(
         controls=[
             ft.Column(
@@ -145,9 +222,11 @@ def setup_pagos_ui(state: PagoUiState) -> ft.Control:
                             state.txt_monto,
                             state.txt_fecha,
                             state.btn_fecha,
+                            state.btn_actualizar,
                             state.btn_registro,
                         ],
                         alignment=ft.MainAxisAlignment.CENTER,
+                        vertical_alignment=ft.CrossAxisAlignment.CENTER,
                     ),
                 ],
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,

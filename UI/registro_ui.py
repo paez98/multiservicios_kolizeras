@@ -3,6 +3,7 @@ from utils.utils import crear_campo_texto
 from logica.manejo_cliente import ManejoCliente
 from logica.manejo_servicio import ManejoServicio
 from logica.logica_pago import LogicaPago
+from .home import actualizar_dashboard
 
 manejo_cliente = ManejoCliente()
 
@@ -21,6 +22,7 @@ def validar_campos(nombre: str, contacto: str):
 def guardar_cliente_desde_dialogo(e, txt_nombre, txt_contacto, txt_direccion):
     """Guarda un cliente desde el diálogo modal."""
     errores = validar_campos(txt_nombre.value.strip(), txt_contacto.value.strip())
+
     if errores:
         txt_nombre.error_text = errores.get("nombre", "")
         txt_contacto.error_text = errores.get("contacto", "")
@@ -34,7 +36,7 @@ def guardar_cliente_desde_dialogo(e, txt_nombre, txt_contacto, txt_direccion):
         txt_contacto.value.strip(),
         txt_direccion.value.strip(),
     )
-
+    actualizar_dashboard()
     # Limpiar los campos
     # limpiar_campos(txt_nombre, txt_contacto, txt_direccion)
 

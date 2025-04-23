@@ -1,13 +1,72 @@
+# pyproject.toml
+
+[build-system]
+# Especifica el sistema de compilación y sus requisitos
+requires = ["setuptools>=61.0"]  # setuptools es un backend común
+build-backend = "setuptools.build_meta"
+
 [project]
+# --- Metadatos Principales del Proyecto ---
 name = "multiservicios-kolizeras"
-version = "0.1.0"
-description = "Add your description here"
-requires-python = ">=3.13, <3.14"
-dependencies = [
-    "dotenv",
-    "flet~=0.27.1",
-    "psycopg2-binary~=2.9.10",
-    "python>=3.13",
-    "python-dotenv~=1.0.1",
-    "supabase~=2.13.0",
+version = "0.1.0"  # Puedes cambiar esto a medida que actualizas tu app
+description = "Aplicación de gestión para taller mecánico usando Flet y Supabase."
+readme = "README.md"  # Opcional: Si tienes un archivo README.md
+requires-python = ">=3.8"  # Ajusta según la versión mínima de Python que Flet necesite o tú soportes
+
+# --- Licencia ---
+# Elige una licencia si es de código abierto (ej: license = {file = "LICENSE.txt"})
+# o marca como propietario si no lo es.
+license = { text = "Proprietary" }
+
+# --- Autores (Opcional) ---
+authors = [
+    { name = "Adrian Paez", email = "adrianpz1198@gmail.com" },
 ]
+
+# --- Clasificadores (Ayudan a PyPI a categorizar tu paquete si lo publicas) ---
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: Microsoft :: Windows",
+    "Development Status :: 3 - Alpha", # O cambia a "4 - Beta", "5 - Production/Stable"
+    "Intended Audience :: End Users/Desktop",
+    "Topic :: Office/Business",
+    "Framework :: Flet",
+]
+
+# --- Dependencias del Proyecto ---
+# Reemplaza el contenido de requirements.txt aquí
+dependencies = [
+    "flet", # Flet como dependencia base. Extras como [all] son más para instalación directa con pip.
+    "supabase",
+    "python-dotenv", # Este es el nombre del paquete para 'dotenv' en PyPI
+    "pyBCV"
+    # Añade otras dependencias si las tienes
+]
+
+# --- URLs del Proyecto (Opcional) ---
+# [project.urls]
+# Homepage = "URL_A_TU_REPO_O_PAGINA"
+# Repository = "URL_A_TU_REPO_GIT"
+
+# --- Scripts de Consola (Opcional - No aplica directamente a Flet GUI apps) ---
+# [project.scripts]
+# mi_comando = "mi_paquete.modulo:funcion_main"
+
+# --- Puntos de Entrada GUI (Opcional - Flet lo maneja diferente) ---
+# [project.gui-scripts]
+# multiservicios-kolizeras = "main:main" # Flet usa su propio sistema `flet run` / `flet build`
+
+# --- Configuración Específica de Herramientas (Opcional) ---
+# [tool.setuptools]
+# # Configuración adicional para setuptools si es necesario
+
+# [tool.black]
+# # Configuración para el formateador Black
+
+# [tool.ruff]
+# # Configuración para el linter Ruff

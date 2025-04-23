@@ -1,80 +1,11 @@
 import flet as ft
 from logica.manejo_servicio import ManejoServicio
-from utils.utils import crear_campo_texto, crear_boton, DialogHandler
+from utils.utils import crear_boton, DialogHandler
 from ui.registro_ui import crear_dialogo_agregar_servicio
 
 manejo_servicio = ManejoServicio()
 
 
-# def validar_campos_servicio(descripcion: str, precio: str):
-#     """Valida los campos obligatorios."""
-#     errores = {}
-#     if not descripcion.strip() or len(descripcion) < 5:
-#         errores["descripcion"] = "Descripcion invalida"
-#     if not precio.strip().isdigit() or len(precio.strip()) < 8:
-#         errores["precio"] = "Precio invalido"
-#     return errores
-
-
-# def guardar_desde_dialogo(e, txt_descripcion, txt_precio):
-#     errores = validar_campos_servicio(
-#         txt_descripcion.value.strip(), txt_precio.value.strip()
-#     )
-#     if errores:
-#         txt_descripcion.error_text = errores.get("descripcion", "")
-#         txt_precio.error_text = errores.get("precio", "")
-#         txt_descripcion.update()
-#         txt_precio.update()
-#         return
-#     manejo_servicio.guardar_servicio(
-#         txt_descripcion.value.strip(), txt_precio.value.strip()
-#     )
-#     e.page.overlay[-1].open = False  # Cierra el último diálogo en el overlay
-#     e.page.update()
-#     e.page.overlay.pop()
-
-
-# def crear_dialogo_agregar_servicio(e):
-#     def close_dlg(e):
-#         """Cierra el dialogo modal"""
-#         # """Cierra el diálogo modal."""
-#         e.page.overlay[-1].open = False
-#         e.page.update()
-#         e.page.overlay.pop()  # Elimina el diálogo del overlay
-
-#     txt_descripcion = crear_campo_texto("Descripción", "Cambio de croche")
-#     txt_precio = crear_campo_texto("Precio", "$ 150")
-
-#     # Crear dialogo modal
-#     dlg_modal = ft.AlertDialog(
-#         modal=True,
-#         title=ft.Text("Registrar Cliente", text_align=ft.TextAlign.CENTER),
-#         content=ft.Column(
-#             controls=[txt_descripcion, txt_precio],
-#             spacing=30,
-#             width=400,
-#             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-#             height=350,
-#         ),
-#         actions=[
-#             ft.TextButton(
-#                 "Guardar",
-#                 style=ft.ButtonStyle(bgcolor="green", color="white"),
-#                 on_click=lambda e: guardar_desde_dialogo(e),
-#             ),
-#             ft.TextButton(
-#                 "Cancelar",
-#                 style=ft.ButtonStyle(bgcolor="red", color="white"),
-#                 on_click=close_dlg,
-#             ),
-#         ],
-#         actions_alignment=ft.MainAxisAlignment.SPACE_EVENLY,
-#     )
-
-#     # Abrir el diálogo
-#     e.control.page.overlay.append(dlg_modal)
-#     dlg_modal.open = True
-#     e.control.page.update()
 
 
 class ServicioUiState:

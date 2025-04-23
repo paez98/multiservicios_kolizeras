@@ -206,10 +206,6 @@ def edit(e, state: ClienteUIState):
     )
 
 
-# DESHACER LOS CAMBIOS PARA LA EDICION DE CLIENTES YA QUE HAY ERRORES
-# HACER DESDE 0 PARA CORREGIR LOS ERRORES
-
-
 # ===============================================
 # 5. INICIALIZACIÓN (Reemplaza las variables globales)
 # ===============================================
