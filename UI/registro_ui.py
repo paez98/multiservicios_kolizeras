@@ -1,4 +1,6 @@
 import flet as ft
+from typing import Optional
+
 from utils.utils import crear_campo_texto
 from logica.manejo_cliente import ManejoCliente
 from logica.manejo_servicio import ManejoServicio
@@ -37,8 +39,6 @@ def guardar_cliente_desde_dialogo(e, txt_nombre, txt_contacto, txt_direccion):
         txt_direccion.value.strip(),
     )
     actualizar_dashboard()
-    # Limpiar los campos
-    # limpiar_campos(txt_nombre, txt_contacto, txt_direccion)
 
     # Cerrar el diálogo
     e.page.overlay[-1].open = False  # Cierra el último diálogo en el overlay
@@ -187,12 +187,88 @@ def crear_dialogo_agregar_servicio(e):
 manejo_pago = LogicaPago()
 
 
-def guardar_pago(e, nombre, servicio, monto, fecha):
+def validar_pago(
+    cliente_dd,
+    servicio_dd,
+    txt_fecha,
+    # metodo: Optional[str] = None,
+):
+    error = {}
+
+    # Validar nombre
+    if not cliente_dd.value:
+        error["nombre"] = "Selecciona un cliente"
+
+    # Validar servicio
+    if not servicio_dd.value:
+        error["servicio"] = "Selecciona un servicio"
+
+    # Validar monto
+
+    # Validar fecha
+    if not txt_fecha.value:
+        error["fecha"] = "Selecciona una fecha"
+
+    # Validar Metodo
+    # if not metodo.strip():
+    #     error["metodo"] = "Debes seleccionar un método de pago"
+
+    return error
+
+
+def guardar_pago(
+    client_dd,
+    servicio_dd,
+    txt_monto,
+    txt_fecha,
+    state: Optional[any] = None,
+    page: Optional[ft.Page] = None,
+):
     """Guarda un pago en la base de datos"""
+
+    errores = validar_pago(client_dd, servicio_dd, txt_fecha)
+    if errores:
+        client_dd.error_text = errores.get("nombre", "")
+        servicio_dd.error_text = errores.get("servicio", "")
+        txt_monto.error_text = errores.get("monto", "")
+        txt_fecha.error_text = errores.get("fecha", "")
+        client_dd.update()
+        servicio_dd.update()
+        txt_monto.update()
+        txt_fecha.update()
+        return
+
+    nombre_val = client_dd.value
+    servicio_val = servicio_dd.value
+    monto_val = txt_monto.value
+    fecha_val = txt_fecha.value
+
+    print(
+        f"Intentando guardar pago. Nombre: {nombre_val}, Servicio: {servicio_val}, Monto: {monto_val}, Fecha: {fecha_val}"
+    )
+
     try:
-        response = manejo_pago.guardar_pago(nombre, servicio, monto, fecha)
+        response = manejo_pago.guardar_pago(
+            nombre_val, servicio_val, monto_val, fecha_val
+        )
         print(f"Pago guardado exitosamente {response}")
-        return response.data
+        if state and page:  # Solo si tenemos el estado y la página
+
+            state.txt_fecha.value = ""
+            state.txt_monto.value = ""
+            # Limpiar errores visuales también
+            state.dd_cliente.error_text = None
+            state.dd_servicio.error_text = None
+            state.txt_fecha.error_text = None
+            # Actualizar controles
+            state.dd_cliente.update()
+            state.dd_servicio.update()
+            state.txt_monto.update()
+            state.txt_fecha.update()
+
+        page.open(ft.SnackBar(ft.Text("¡Pago registrado con éxito!")))
+
+        return response
     except Exception as e:
         print(f"Error al guardar el pago: {e}")
         return None

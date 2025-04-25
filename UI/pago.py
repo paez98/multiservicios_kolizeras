@@ -1,10 +1,10 @@
 import datetime
 import flet as ft
+from typing import Optional
 from logica.logica_pago import LogicaPago
 from logica.manejo_cliente import ManejoCliente
 from logica.manejo_servicio import ManejoServicio
-from ui.registro_ui import manejo_pago
-from ui.servicios import ServicioUiState
+from ui.registro_ui import guardar_pago
 
 
 # ===============================================
@@ -83,13 +83,21 @@ class PagoUiState:
                 bgcolor=ft.Colors.PURPLE_300,
                 padding=ft.padding.all(10),
             ),
-            on_click=lambda e: self._registrar_pago(
-                self.dd_cliente.value,
-                self.dd_servicio.value,
-                self.txt_monto.value.strip(),
-                self.txt_fecha.value.strip(),
+            # on_click=lambda e: self._registrar_pago(
+            #     self.dd_cliente,
+            #     self.dd_servicio,
+            #     self.txt_monto,
+            #     self.txt_fecha,
+            #     e.page,
+            # ),
+            on_click=lambda e: guardar_pago(
+                client_dd=self.dd_cliente,
+                servicio_dd=self.dd_servicio,
+                txt_monto=self.txt_monto,
+                txt_fecha=self.txt_fecha,
+                state=pago_state,
+                page=e.page,
             ),
-            # on_click= lambda  e: manejo_pago.guardar_pago(self.dd_cliente.value,self.dd_servicio.value, self.txt_monto.value,self.txt_fecha.value.strip()),
             col={"sm": 12, "lg": 1.5},
         )
 
@@ -118,18 +126,6 @@ class PagoUiState:
         self._cargar_servicios_dropdown()
 
     # region METODOS
-    def _registrar_pago(self, nombre, servicio, monto, fecha):
-        manejo_pago.guardar_pago(nombre, servicio, monto, fecha)
-
-        self.dd_cliente.value = ""
-        self.dd_servicio.value = ""
-        self.txt_fecha.value = ""
-        self.txt_monto.value = ""
-
-        self.txt_monto.update()
-        self.dd_servicio.update()
-        self.dd_cliente.update()
-        self.txt_fecha.update()
 
     def _abrir_date_picker(self, e):
         """Abre el selector de fecha"""
@@ -236,6 +232,7 @@ def setup_pagos_ui(state: PagoUiState) -> ft.Control:
                 content=ft.Column(
                     controls=[state.lista_de_pago],
                     horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
+                    scroll=ft.ScrollMode.AUTO,
                 ),
                 expand=True,
             ),

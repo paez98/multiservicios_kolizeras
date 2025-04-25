@@ -10,7 +10,7 @@ manejo = ManejoCliente()
 servicio = ManejoServicio()
 fake = Faker()
 
-
+ 
 def main(page: ft.Page):
     # Configuración de la ventana
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER

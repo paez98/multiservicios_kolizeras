@@ -37,7 +37,7 @@ class LogicaPago:
                 )
                 .execute()
             )
-            print(f"Pago guardado exitosamente {response}")
+
             return response.data
         except Exception as e:
             print(f"Error al guardar el pago: {e}")
