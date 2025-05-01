@@ -109,6 +109,8 @@ def setup_cliente_ui(state: ClienteUIState):
 # 5. FUNCIONES INTERNAS - (Los "ayudantes secretos")
 # ===============================================
 # region LOGCIA
+
+
 def _cargar_clientes(e, state: ClienteUIState):
     # Tu lógica actual usando state.lista_clientes y state.manejo_cliente
     try:

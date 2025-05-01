@@ -6,6 +6,13 @@
       <excludeFolder url="file://$MODULE_DIR$/.venvt" />
       <excludeFolder url="file://$MODULE_DIR$/venvt" />
       <excludeFolder url="file://$MODULE_DIR$/venvv" />
+      <excludeFolder url="file://$MODULE_DIR$/build/flutter/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/build/flutter/android/app/src/main/java" />
+      <excludeFolder url="file://$MODULE_DIR$/build/flutter/build" />
+      <excludeFolder url="file://$MODULE_DIR$/build/flutter/linux/flutter/ephemeral" />
+      <excludeFolder url="file://$MODULE_DIR$/build/flutter/macos/Flutter/ephemeral" />
+      <excludeFolder url="file://$MODULE_DIR$/build/flutter/windows/flutter/ephemeral" />
+      <excludeFolder url="file://$MODULE_DIR$/build/windows/Lib/venv" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.13 virtualenv at C:\multiservicioskolizeras\venv" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

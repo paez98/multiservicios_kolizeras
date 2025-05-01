@@ -6,8 +6,6 @@ from ui.registro_ui import crear_dialogo_agregar_servicio
 manejo_servicio = ManejoServicio()
 
 
-
-
 class ServicioUiState:
     def __init__(self):
         self.manejo = ManejoServicio()
@@ -45,7 +43,7 @@ def setup_servicio_ui(state: ServicioUiState):
                     ft.Text(
                         "Servicios registrados",
                         size=25,
-                        weight="bold",
+                        weight=ft.FontWeight.BOLD,
                         text_align=ft.TextAlign.CENTER,
                     ),
                     ft.Row(

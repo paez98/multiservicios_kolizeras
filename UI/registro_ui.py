@@ -1,10 +1,7 @@
 import flet as ft
-from typing import Optional
-
 from utils.utils import crear_campo_texto
 from logica.manejo_cliente import ManejoCliente
 from logica.manejo_servicio import ManejoServicio
-from logica.logica_pago import LogicaPago
 from .home import actualizar_dashboard
 
 manejo_cliente = ManejoCliente()
@@ -111,10 +108,20 @@ manejo_servicio = ManejoServicio()
 def validar_campos_servicio(descripcion: str, precio: str):
     """Valida los campos obligatorios."""
     errores = {}
+
+    # Validación de descripción
     if not descripcion.strip() or len(descripcion) < 5:
-        errores["descripcion"] = "Descripcion invalida"
-    if not precio.strip().isdigit():
-        errores["precio"] = "Precio invalido"
+        errores["descripcion"] = "Descripción inválida (mínimo 5 caracteres)"
+
+    # Validación de precio
+    precio_limpio = precio.strip().replace(",", ".")  # Aceptar comas y puntos
+    try:
+        precio_num = float(precio_limpio)
+        if precio_num <= 0:
+            errores["precio"] = "El precio debe ser mayor a cero"
+    except ValueError:
+        errores["precio"] = "Formato inválido (ej. 10.50 o 5,99)"
+
     return errores
 
 
@@ -146,7 +153,7 @@ def crear_dialogo_agregar_servicio(e):
         e.page.overlay.pop()  # Elimina el diálogo del overlay
 
     txt_descripcion = crear_campo_texto("Descripción", "Cambio de croche")
-    txt_precio = crear_campo_texto("Precio", "150")
+    txt_precio = crear_campo_texto("Precio")
     txt_precio.prefix_text = "$"
 
     # Crear dialogo modal
@@ -181,94 +188,3 @@ def crear_dialogo_agregar_servicio(e):
     e.control.page.overlay.append(dlg_modal)
     dlg_modal.open = True
     e.control.page.update()
-
-
-# region PAGOS
-manejo_pago = LogicaPago()
-
-
-def validar_pago(
-    cliente_dd,
-    servicio_dd,
-    txt_fecha,
-    # metodo: Optional[str] = None,
-):
-    error = {}
-
-    # Validar nombre
-    if not cliente_dd.value:
-        error["nombre"] = "Selecciona un cliente"
-
-    # Validar servicio
-    if not servicio_dd.value:
-        error["servicio"] = "Selecciona un servicio"
-
-    # Validar monto
-
-    # Validar fecha
-    if not txt_fecha.value:
-        error["fecha"] = "Selecciona una fecha"
-
-    # Validar Metodo
-    # if not metodo.strip():
-    #     error["metodo"] = "Debes seleccionar un método de pago"
-
-    return error
-
-
-def guardar_pago(
-    client_dd,
-    servicio_dd,
-    txt_monto,
-    txt_fecha,
-    state: Optional[any] = None,
-    page: Optional[ft.Page] = None,
-):
-    """Guarda un pago en la base de datos"""
-
-    errores = validar_pago(client_dd, servicio_dd, txt_fecha)
-    if errores:
-        client_dd.error_text = errores.get("nombre", "")
-        servicio_dd.error_text = errores.get("servicio", "")
-        txt_monto.error_text = errores.get("monto", "")
-        txt_fecha.error_text = errores.get("fecha", "")
-        client_dd.update()
-        servicio_dd.update()
-        txt_monto.update()
-        txt_fecha.update()
-        return
-
-    nombre_val = client_dd.value
-    servicio_val = servicio_dd.value
-    monto_val = txt_monto.value
-    fecha_val = txt_fecha.value
-
-    print(
-        f"Intentando guardar pago. Nombre: {nombre_val}, Servicio: {servicio_val}, Monto: {monto_val}, Fecha: {fecha_val}"
-    )
-
-    try:
-        response = manejo_pago.guardar_pago(
-            nombre_val, servicio_val, monto_val, fecha_val
-        )
-        print(f"Pago guardado exitosamente {response}")
-        if state and page:  # Solo si tenemos el estado y la página
-
-            state.txt_fecha.value = ""
-            state.txt_monto.value = ""
-            # Limpiar errores visuales también
-            state.dd_cliente.error_text = None
-            state.dd_servicio.error_text = None
-            state.txt_fecha.error_text = None
-            # Actualizar controles
-            state.dd_cliente.update()
-            state.dd_servicio.update()
-            state.txt_monto.update()
-            state.txt_fecha.update()
-
-        page.open(ft.SnackBar(ft.Text("¡Pago registrado con éxito!")))
-
-        return response
-    except Exception as e:
-        print(f"Error al guardar el pago: {e}")
-        return None

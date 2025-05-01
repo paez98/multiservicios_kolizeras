@@ -1,6 +1,5 @@
 import flet as ft
 from tasa import usd_rate
-from style import Colores
 from logica.manejo_cliente import ManejoCliente
 
 manejo_cliente = ManejoCliente()
@@ -13,9 +12,7 @@ container_style = {
 
 class TotalData(ft.Container):
     def __init__(self):
-        super().__init__(
-            **container_style, border=ft.border.all(1, Colores.COLOR_BORDE.value)
-        )
+        super().__init__(**container_style, border=ft.border.all(1))
         self.txt_total_clientes = ft.Text("...", weight=ft.FontWeight.BOLD)
 
         self.content = ft.Column(
@@ -35,6 +32,12 @@ class TotalData(ft.Container):
                                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                                 ),
                                 padding=10,
+                                scale=1.0,
+                                animate_scale=ft.Animation(
+                                    300, ft.AnimationCurve.EASE_OUT
+                                ),
+                                on_click=lambda _: print("click card"),
+                                on_hover=self.on_hover,
                             ),
                         ),
                         # Clientes de la semana
@@ -68,6 +71,7 @@ class TotalData(ft.Container):
                                 padding=10,
                             ),
                         ),
+                        # Tasa dolar
                         ft.Card(
                             content=ft.Container(
                                 content=ft.Column(
@@ -97,11 +101,16 @@ class TotalData(ft.Container):
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
         )
 
+    def _on_card(self, e):
+        is_hover = e.data == True
+
+        contenedor = e.control
+
+        contenedor.scale = 1.1 if is_hover else 1.0
+        contenedor.update()
+
     def actualizar_clientes_totales(self, valor: int):
         self.txt_total_clientes.value = str(valor)
-
-
-"CREAR LA FUNCION PARA QUE SE ACTUALICE EL DASHBOARD Y EVITAR LA CARGA INICIAL DE LOS DATOS"
 
 
 class IngresosData(ft.Container):
@@ -365,7 +374,32 @@ class OrdenesData(ft.Container):
                         ft.DataCell(ft.Text("Axel Paez")),
                         ft.DataCell(ft.Text("May 25,2025")),
                         ft.DataCell(
-                            ft.Text("Completado", color=ft.Colors.GREEN_ACCENT_400)
+                            ft.Dropdown(
+                                options=[
+                                    ft.DropdownOption("Completado"),
+                                    ft.DropdownOption("En proceso"),
+                                ]
+                            )
+                        ),
+                    ]
+                ),
+                ft.DataRow(
+                    cells=[
+                        ft.DataCell(ft.Text("Cambio de croche")),
+                        ft.DataCell(ft.Text("Adrian")),
+                        ft.DataCell(ft.Text("Mar 13,2025")),
+                        ft.DataCell(
+                            ft.Text("En proceso", color=ft.Colors.DEEP_ORANGE_ACCENT)
+                        ),
+                    ]
+                ),
+                ft.DataRow(
+                    cells=[
+                        ft.DataCell(ft.Text("Cambio de croche")),
+                        ft.DataCell(ft.Text("Adrian")),
+                        ft.DataCell(ft.Text("Mar 13,2025")),
+                        ft.DataCell(
+                            ft.Text("En proceso", color=ft.Colors.DEEP_ORANGE_ACCENT)
                         ),
                     ]
                 ),
@@ -405,6 +439,7 @@ class OrdenesData(ft.Container):
 container_cliente = TotalData()
 container_pago = IngresosData()
 container_servicios = ServiciosData()
+container_ordenes = OrdenesData()
 
 
 def actualizar_dashboard(e=None):
@@ -418,6 +453,7 @@ def actualizar_dashboard(e=None):
     print(f"Clientes totales: {total_clientes}")
 
 
+# region VISTA
 class HomeUiState(ft.Container):
     def __init__(self):
         super().__init__(**container_style, expand=True)
@@ -435,8 +471,15 @@ class HomeUiState(ft.Container):
                             col=6,
                             # offset=ft.transform.Offset(0, -0.31),
                         ),
-                        ft.Container(content=container_servicios, col=6),
-                        # ft.Container(content=container_ordenes, col=6),
+                        ft.Column(
+                            controls=[
+                                ft.Container(
+                                    content=container_servicios,
+                                ),
+                                ft.Container(content=container_ordenes),
+                            ],
+                            col=6,
+                        ),
                     ]
                 ),
             ],

@@ -22,7 +22,7 @@ class LogicaPago:
             print(f"Error al cargar los pagos: {e}")
             return []
 
-    def guardar_pago(self, nombre, servicio, monto, fecha):
+    def guardar_pago(self, nombre, servicio, monto, referencia, fecha):
         """Guarda un pago en la base de datos"""
         try:
             response = (
@@ -32,6 +32,7 @@ class LogicaPago:
                         "nombre": nombre,
                         "servicio": servicio,
                         "monto": monto,
+                        "referencia": referencia,
                         "fecha": fecha,
                     }
                 )
