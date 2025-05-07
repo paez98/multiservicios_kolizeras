@@ -1,14 +1,15 @@
 import flet as ft
 from logica.manejo_servicio import ManejoServicio
+from logica.manejo_ordenes import ManejoOrdenes
+from ui.home import container_ordenes_home
 
 
 class OrdenContainer(ft.Container):
-    def __init__(self, servicio, vehiculo, descripcion, fecha_limite):
+    def __init__(self, servicio, vehiculo: str, descripcion, fecha_limite):
         super().__init__(
-            border=ft.border.all(1, "red"),
             border_radius=15,
             on_hover=self._on_hover,
-            on_click=self._on_click,
+            on_click=self.abrir_dialogo,
             animate_scale=ft.Animation(200, ft.AnimationCurve.EASE_IN_CIRC),
         )
         self.servicio = servicio
@@ -22,21 +23,86 @@ class OrdenContainer(ft.Container):
                 content=ft.Column(
                     [
                         # Servicio a realizar
-                        ft.Text(self.servicio),
+                        ft.Text(
+                            self.servicio,
+                            theme_style=ft.TextThemeStyle.TITLE_LARGE,
+                            weight=ft.FontWeight.BOLD,
+                            text_align=ft.TextAlign.CENTER,
+                        ),
                         # Vehiculo
-                        ft.Text(self.vehiculo),
-                        ft.Text(self.descripcion),
+                        ft.Text(
+                            self.vehiculo, theme_style=ft.TextThemeStyle.TITLE_MEDIUM
+                        ),
+                        ft.Text(
+                            self.descripcion,
+                            overflow=ft.TextOverflow.ELLIPSIS,
+                            max_lines=5,
+                            no_wrap=True,
+                            text_align=ft.TextAlign.CENTER,
+                        ),
                         # Fecha de entrega
-                        ft.Text(self.fecha_limite),
+                        ft.Text(self.fecha_limite, text_align=ft.TextAlign.RIGHT),
                     ],
                     spacing=5,
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                 ),
                 padding=15,
             ),
         )
 
         self.content = self.base_content
+        # -----DIALOGO MODAL-----
+        self.detalles_dialogo = ft.AlertDialog(
+            modal=True,
+            title=ft.Text(f"Detalles Orden: {self.vehiculo.capitalize()}"),
+            content=ft.Container(
+                width=400,
+                padding=10,
+                content=ft.Column(
+                    [
+                        # Sección Servicio
+                        ft.Row(
+                            [
+                                ft.Icon(ft.Icons.MISCELLANEOUS_SERVICES),
+                                ft.Text("Servicio:", weight=ft.FontWeight.BOLD),
+                            ]
+                        ),
+                        ft.Text(self.servicio),
+                        ft.Divider(height=10, color=ft.Colors.TRANSPARENT),
+                        # Sección Descripción
+                        ft.Row(
+                            [
+                                ft.Icon(ft.Icons.DESCRIPTION),
+                                ft.Text(
+                                    "Descripción:",
+                                    weight=ft.FontWeight.BOLD,
+                                ),
+                            ]
+                        ),
+                        ft.Container(
+                            content=ft.Text(self.descripcion),
+                            padding=ft.padding.only(left=5),
+                        ),
+                        ft.Divider(height=10, color=ft.Colors.TRANSPARENT),
+                        # Sección Fecha Límite
+                        ft.Row(
+                            [
+                                ft.Icon(ft.Icons.EVENT_AVAILABLE),
+                                ft.Text("Fecha Límite:", weight=ft.FontWeight.BOLD),
+                            ]
+                        ),
+                        ft.Text(self.fecha_limite),
+                    ],
+                    spacing=5,
+                    scroll=ft.ScrollMode.ADAPTIVE,
+                    height=300,
+                ),
+            ),
+            actions=[ft.TextButton("Cerrar", on_click=self.close_dialogo)],
+            actions_alignment=ft.MainAxisAlignment.END,
+        )
 
+    # -----METODOS-----
     def _on_hover(self, e):
         container = e.control
         hover = e.data == "true"
@@ -44,26 +110,38 @@ class OrdenContainer(ft.Container):
         container.elevation = 20 if hover else 5  # Ajustar elevación con hover
         container.update()
 
-    def _on_click(self, e):
-        print("alao")
+    def abrir_dialogo(self, e):
+        e.control.page.overlay.append(self.detalles_dialogo)
+        self.detalles_dialogo.open = True
+        e.control.page.update()
+
+    def close_dialogo(self, e):
+        """Cierra el dialogo modal"""
+        # """Cierra el diálogo modal."""
+        e.page.overlay[-1].open = False
+        e.page.update()
+        e.page.overlay.pop()
 
 
 class AgregarOrden(ft.Container):
     def __init__(self):
         super().__init__(
-            border=ft.border.all(1, "red"),
             padding=30,
             border_radius=15,
             animate_scale=ft.Animation(200, ft.AnimationCurve.EASE_IN_CIRC),
             on_hover=self._on_hover,
             on_click=self.abrir_dialogo,
+            bgcolor=ft.Colors.GREY_900,
         )
+
         self.manejo_servicios = ManejoServicio()
+        self.manejo_ordenes = ManejoOrdenes()
 
         # -------CAMPOS DE TEXTO-------
         self.dd_servicio = ft.Dropdown(
             label="Servicio", enable_filter=True, editable=True, options=[]
         )
+        self.txt_mecanico = ft.TextField(label="Mecanico", col=6)
 
         self.txt_vehiculo = ft.TextField(
             label="Vehiculo",
@@ -73,7 +151,7 @@ class AgregarOrden(ft.Container):
             multiline=True,
             max_lines=7,
         )
-        self.txt_fecha = ft.TextField(label="Fecha de entrega")
+        self.txt_fecha = ft.TextField(label="Fecha de entrega", col=6)
 
         # -------BOTONES-------
         self.btn_registrar = ft.ElevatedButton("Registrar", on_click=self.agregar_orden)
@@ -99,7 +177,6 @@ class AgregarOrden(ft.Container):
             ),
             actions=[self.btn_registrar, self.btn_cancelar],
             actions_alignment=ft.MainAxisAlignment.END,  # Alinear botones
-            # bgcolor=ft.Colors.with_opacity(0.9, ft.Colors.GREY_400),
         )
 
         self.content = ft.Container(
@@ -108,13 +185,12 @@ class AgregarOrden(ft.Container):
                 size=72,
                 color=ft.Colors.with_opacity(0.8, "blue"),
             ),
-            border=ft.border.all(1, "blue"),
+            bgcolor=ft.Colors.with_opacity(0.8, ft.Colors.GREY_800),
             border_radius=15,
         )
         self.cargar_dropdown()
 
     # -----Metodos-----
-
     def cargar_dropdown(self):
         servicios = self.manejo_servicios.cargar_servicios()
         self.dd_servicio.options = [
@@ -147,21 +223,64 @@ class AgregarOrden(ft.Container):
         e.control.page.update()
 
     def agregar_orden(self, e):
+        self.manejo_ordenes.guardar_orden(
+            servicio=self.dd_servicio.value.strip(),
+            vehiculo=self.txt_vehiculo.value.strip(),
+            descripcion=self.txt_descripcion.value.strip(),
+            fecha=self.txt_fecha.value.strip(),
+        )
         orden = OrdenContainer(
             servicio=self.dd_servicio.value.capitalize(),
             vehiculo=self.txt_vehiculo.value.capitalize(),
             descripcion=self.txt_descripcion.value.capitalize(),
             fecha_limite=self.txt_fecha.value.capitalize(),
         )
-        container_ordenes.grid.controls.append(orden)
+
+        container_ordenes_ui.grid.controls.insert(1, orden)
         e.page.overlay[-1].open = False
         e.page.update()
         e.page.overlay.pop()
-        container_ordenes.grid.update()
+        container_ordenes_ui.grid.update()
         print("asdasdasd")
+
+        container_ordenes_home.actualizar_tabla(
+            self.dd_servicio.value,
+            self.txt_fecha.value,
+            "parao",
+        )
+
+    # def cargar_ordenes(self):
+    #     ordenes = self.manejo_ordenes.cargar_ordenes()
+    #     ordenes.reverse()
+    #     for datos in ordenes:
+    #         orden = OrdenContainer(
+    #             datos["servicio"],
+    #             datos["vehiculo"],
+    #             datos["descripcion"],
+    #             datos["fecha"],
+    #         )
+    #         container_ordenes_ui.grid.controls.append(orden)
+    #
+    #     container_ordenes_ui.grid.update()
 
 
 add_container = AgregarOrden()
+
+manejo_orden = ManejoOrdenes()
+
+
+def cargar_orden(e):
+    ordenes = manejo_orden.cargar_ordenes()
+    ordenes.reverse()
+    for datos in ordenes:
+        orden = OrdenContainer(
+            datos["servicio"],
+            datos["vehiculo"],
+            datos["descripcion"],
+            datos["fecha"],
+        )
+        container_ordenes_ui.grid.controls.append(orden)
+        container_ordenes_ui.grid.update()
 
 
 # region VISTA
@@ -184,10 +303,11 @@ class OrdenesUi(ft.Container):
                 ft.Text(
                     "Ordenes de Trabajo", theme_style=ft.TextThemeStyle.TITLE_LARGE
                 ),
-                ft.Container(content=self.grid, padding=15),
+                ft.Container(content=self.grid, padding=15, expand=True),
             ],
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+            expand=True,
         )
 
 
-container_ordenes = OrdenesUi()
+container_ordenes_ui = OrdenesUi()

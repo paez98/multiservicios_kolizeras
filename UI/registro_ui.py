@@ -35,7 +35,7 @@ def guardar_cliente_desde_dialogo(e, txt_nombre, txt_contacto, txt_direccion):
         txt_contacto.value.strip(),
         txt_direccion.value.strip(),
     )
-    actualizar_dashboard()
+    actualizar_dashboard(e)
 
     # Cerrar el diálogo
     e.page.overlay[-1].open = False  # Cierra el último diálogo en el overlay

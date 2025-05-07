@@ -1,18 +1,27 @@
 import flet as ft
+
+from decimal import Decimal
 from tasa import usd_rate
 from logica.manejo_cliente import ManejoCliente
+from logica.logica_pago import LogicaPago
+from logica.manejo_ordenes import ManejoOrdenes
 
+manejo_ordenes = ManejoOrdenes()
 manejo_cliente = ManejoCliente()
+manejo_pagos = LogicaPago()
 
 container_style = {
     "border_radius": 10,
     "padding": 5,
+    "border": ft.border.all(1, ft.Colors.with_opacity(0.2, ft.Colors.ON_SURFACE)),
 }
 
 
 class TotalData(ft.Container):
     def __init__(self):
-        super().__init__(**container_style, border=ft.border.all(1))
+        super().__init__(
+            **container_style,
+        )
         self.txt_total_clientes = ft.Text("...", weight=ft.FontWeight.BOLD)
 
         self.content = ft.Column(
@@ -109,155 +118,133 @@ class TotalData(ft.Container):
         contenedor.scale = 1.1 if is_hover else 1.0
         contenedor.update()
 
-    def actualizar_clientes_totales(self, valor: int):
-        self.txt_total_clientes.value = str(valor)
-
 
 class IngresosData(ft.Container):
     def __init__(self):
-        super().__init__(border=ft.border.all(1, "blue"), padding=10)
-        self.chart = ft.BarChart(
-            bar_groups=[
-                # Barra lunes
-                ft.BarChartGroup(
-                    x=0,
-                    bar_rods=[
-                        ft.BarChartRod(
-                            from_y=0,
-                            to_y=40,
-                            # width=,
-                            color=ft.Colors.AMBER,
-                            tooltip="Apple",
-                            border_radius=15,
-                        ),
-                    ],
+        super().__init__(
+            **container_style,
+        )
+
+        self.pagos = manejo_pagos.cargar_pagos()
+        self.pagos_dolares = 0
+        self.pagos_bolivares = 0
+
+        self.left_axis = ft.ChartAxis(
+            labels_size=40,
+            show_labels=True,
+        )
+        # LABELS DE DIAS
+        self.bottom_axis = ft.ChartAxis(
+            labels=[  # Etiquetas fijas para los días
+                ft.ChartAxisLabel(
+                    value=0, label=ft.Container(ft.Text("Lun"), padding=5)
                 ),
-                # Barra martes
-                ft.BarChartGroup(
-                    x=1,
-                    bar_rods=[
-                        ft.BarChartRod(
-                            from_y=0,
-                            to_y=100,
-                            # width=,
-                            color=ft.Colors.RED,
-                            tooltip="Blueberry",
-                            border_radius=15,
-                        ),
-                    ],
+                ft.ChartAxisLabel(
+                    value=1, label=ft.Container(ft.Text("Mar"), padding=5)
                 ),
-                # Barra miercoles
-                ft.BarChartGroup(
-                    x=2,
-                    bar_rods=[
-                        ft.BarChartRod(
-                            from_y=0,
-                            to_y=30,
-                            # width=,
-                            color=ft.Colors.RED,
-                            tooltip="Cherry",
-                            border_radius=15,
-                        ),
-                    ],
+                ft.ChartAxisLabel(
+                    value=2, label=ft.Container(ft.Text("Mié"), padding=5)
                 ),
-                # Barra jueves
-                ft.BarChartGroup(
-                    x=3,
-                    bar_rods=[
-                        ft.BarChartRod(
-                            from_y=0,
-                            to_y=60,
-                            # width=,
-                            color=ft.Colors.ORANGE,
-                            tooltip="Orange",
-                            border_radius=15,
-                        ),
-                    ],
+                ft.ChartAxisLabel(
+                    value=3, label=ft.Container(ft.Text("Jue"), padding=5)
                 ),
-                # Barra viernes
-                ft.BarChartGroup(
-                    x=4,
-                    bar_rods=[
-                        ft.BarChartRod(
-                            from_y=0,
-                            to_y=60.5,
-                            # width=,
-                            color=ft.Colors.AMBER,
-                            tooltip="manzana",
-                            border_radius=15,
-                        ),
-                    ],
+                ft.ChartAxisLabel(
+                    value=4, label=ft.Container(ft.Text("Vie"), padding=5)
                 ),
-                # Barra sabado
-                ft.BarChartGroup(
-                    x=5,
-                    bar_rods=[
-                        ft.BarChartRod(
-                            from_y=0,
-                            to_y=60.5,
-                            # width=,
-                            color=ft.Colors.AMBER,
-                            tooltip="manzana",
-                            border_radius=15,
-                        ),
-                    ],
+                ft.ChartAxisLabel(
+                    value=5, label=ft.Container(ft.Text("Sáb"), padding=5)
+                ),
+                ft.ChartAxisLabel(
+                    value=6, label=ft.Container(ft.Text("Dom"), padding=5)
                 ),
             ],
-            left_axis=ft.ChartAxis(
-                labels_size=40,
-                show_labels=True,
+            labels_size=40,
+        )
+
+        self.chart = ft.BarChart(
+            bar_groups=[],
+            left_axis=self.left_axis,
+            bottom_axis=self.bottom_axis,
+            horizontal_grid_lines=ft.ChartGridLines(
+                color=ft.Colors.with_opacity(0.2, ft.Colors.ON_SURFACE), width=1
             ),
-            bottom_axis=ft.ChartAxis(
-                labels=[
-                    ft.ChartAxisLabel(
-                        value=0, label=ft.Container(ft.Text("Lunes"), padding=10)
-                    ),
-                    ft.ChartAxisLabel(
-                        value=1, label=ft.Container(ft.Text("Martes"), padding=10)
-                    ),
-                    ft.ChartAxisLabel(
-                        value=2, label=ft.Container(ft.Text("Miercoles"), padding=10)
-                    ),
-                    ft.ChartAxisLabel(
-                        value=3, label=ft.Container(ft.Text("Jueves"), padding=10)
-                    ),
-                    ft.ChartAxisLabel(
-                        value=4, label=ft.Container(ft.Text("Viernes"), padding=10)
-                    ),
-                    ft.ChartAxisLabel(
-                        value=5, label=ft.Container(ft.Text("Sabado "), padding=10)
-                    ),
-                ],
-                labels_size=40,
-            ),
-            horizontal_grid_lines=ft.ChartGridLines(color=ft.Colors.GREY_300, width=1),
-            tooltip_bgcolor=ft.Colors.with_opacity(0.5, ft.Colors.GREY_300),
+            tooltip_bgcolor=ft.Colors.with_opacity(0.8, ft.Colors.SECONDARY),
             interactive=True,
             expand=True,
-            border=ft.border.all(1, "orange"),
+        )
+        self.txt_total_semana = ft.Text(
+            "Total Semana ($): ...", weight=ft.FontWeight.BOLD
         )
 
         self.content = ft.Column(
-            controls=[ft.Text("Ingresos Semanales"), self.chart, ft.Text("Total: ")],
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-        )
-
-
-class PagosData(ft.Container):
-    def __init__(self):
-        super().__init__()
-        self.content = ft.Row(
             controls=[
-                ft.Container(content=ft.Column([ft.Text("Ingresos del mes")])),
-                ft.Container(content=ft.Column([ft.Text("Pagos del mes")])),
-            ]
+                ft.Text(
+                    "Ingresos Diarios $ (Semana Actual)",
+                    size=18,
+                    weight=ft.FontWeight.BOLD,
+                ),
+                self.chart,
+                self.txt_total_semana,
+            ],
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+            expand=True,
+            spacing=10,
         )
+
+    def cargar_grafica(self):
+        barra_bs = ft.BarChartRod(
+            from_y=0,
+            width=25,  # Ancho de barra
+            color="blue",  # Asignar color,
+            border_radius=5,
+        )
+        barra_dolar = ft.BarChartRod(
+            from_y=0,
+            width=25,  # Ancho de barra
+            color="green",  # Asignar color,
+            border_radius=5,
+        )
+        nuevo_grupo = []
+        for data in self.pagos:
+            monto = data["monto"]
+            if monto.startswith("Bs."):
+                monto_limpio = monto.replace("Bs.", "").strip().replace(" ", "")
+                print(monto_limpio)
+                valor = Decimal(monto_limpio)
+                self.pagos_bolivares += valor
+                print(valor)
+                barra_bs.to_y = float(self.pagos_bolivares)
+                barra_bs.tooltip = f"Bs. {self.pagos_bolivares}"
+
+            if monto.startswith("$"):
+                monto_limpio = monto.replace("$", "").replace(" ", "")
+                print(monto_limpio)
+                valor_usd = Decimal(monto_limpio)
+                self.pagos_dolares += valor_usd
+                # print(valor)
+                barra_dolar.to_y = float(self.pagos_dolares)
+                barra_dolar.tooltip = f"USD{self.pagos_dolares}"
+
+            if self.pagos_dolares > self.pagos_bolivares:
+                self.chart.max_y = self.pagos_dolares + 20
+            else:
+                self.chart.max_y = self.pagos_bolivares + 20
+
+        grupo = [ft.BarChartGroup(x=1, bar_rods=[barra_bs, barra_dolar])]
+        self.txt_total_semana.value = (
+            f"Total Semana $: {self.pagos_dolares} | Bs.:{self.pagos_bolivares}"
+        )
+        self.txt_total_semana.update()
+        self.chart.bar_groups = grupo
+        self.chart.update()
+        self.pagos_bolivares = 0
+        self.pagos_dolares = 0
 
 
 class ServiciosData(ft.Container):
     def __init__(self):
         super().__init__(
-            border=ft.border.all(1, "yellow"),
+            **container_style,
         )
         self.content = ft.Column(
             controls=[
@@ -358,67 +345,29 @@ class ServiciosData(ft.Container):
 
 class OrdenesData(ft.Container):
     def __init__(self):
-        super().__init__(border=ft.border.all(1, "red"))
+        super().__init__(
+            **container_style,
+        )
 
         self.tabla = ft.DataTable(
             columns=[
-                ft.DataColumn(label=ft.Text("Nombre")),
-                ft.DataColumn(label=ft.Text("Mecanico")),
+                ft.DataColumn(label=ft.Text("Servicio")),
                 ft.DataColumn(label=ft.Text("Fecha de entrega")),
                 ft.DataColumn(label=ft.Text("Estado")),
             ],
-            rows=[
-                ft.DataRow(
-                    cells=[
-                        ft.DataCell(ft.Text("Motor de spark")),
-                        ft.DataCell(ft.Text("Axel Paez")),
-                        ft.DataCell(ft.Text("May 25,2025")),
-                        ft.DataCell(
-                            ft.Dropdown(
-                                options=[
-                                    ft.DropdownOption("Completado"),
-                                    ft.DropdownOption("En proceso"),
-                                ]
-                            )
-                        ),
-                    ]
-                ),
-                ft.DataRow(
-                    cells=[
-                        ft.DataCell(ft.Text("Cambio de croche")),
-                        ft.DataCell(ft.Text("Adrian")),
-                        ft.DataCell(ft.Text("Mar 13,2025")),
-                        ft.DataCell(
-                            ft.Text("En proceso", color=ft.Colors.DEEP_ORANGE_ACCENT)
-                        ),
-                    ]
-                ),
-                ft.DataRow(
-                    cells=[
-                        ft.DataCell(ft.Text("Cambio de croche")),
-                        ft.DataCell(ft.Text("Adrian")),
-                        ft.DataCell(ft.Text("Mar 13,2025")),
-                        ft.DataCell(
-                            ft.Text("En proceso", color=ft.Colors.DEEP_ORANGE_ACCENT)
-                        ),
-                    ]
-                ),
-                ft.DataRow(
-                    cells=[
-                        ft.DataCell(ft.Text("Cambio de croche")),
-                        ft.DataCell(ft.Text("Adrian")),
-                        ft.DataCell(ft.Text("Mar 13,2025")),
-                        ft.DataCell(
-                            ft.Text("En proceso", color=ft.Colors.DEEP_ORANGE_ACCENT)
-                        ),
-                    ]
-                ),
-            ],
+            rows=[],
+            # column_spacing=20,
+            # heading_row_height=40,
+            # data_row_max_height=50,
+            border=ft.border.all(1, ft.Colors.with_opacity(0.1, ft.Colors.ON_SURFACE)),
+            border_radius=ft.border_radius.all(6),
         )
         self.content = ft.Column(
             controls=[
                 ft.Text(
-                    "Ordenes de Trabajo", theme_style=ft.TextThemeStyle.TITLE_LARGE
+                    "Órdenes Recientes / Pendientes",  # Título más descriptivo
+                    theme_style=ft.TextThemeStyle.TITLE_MEDIUM,
+                    weight=ft.FontWeight.BOLD,
                 ),
                 ft.Row(
                     controls=[
@@ -434,29 +383,60 @@ class OrdenesData(ft.Container):
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
         )
 
+    def actualizar_tabla(self, descripcion, fecha_entrega, estado):
+        row = ft.DataRow(
+            cells=[
+                ft.DataCell(ft.Text(descripcion)),
+                ft.DataCell(ft.Text(fecha_entrega)),
+                ft.DataCell(ft.Text(estado)),
+            ]
+        )
+
+        self.tabla.rows.insert(0, row)
+
+        self.tabla.update()
+
 
 # Instancias de clases
 container_cliente = TotalData()
 container_pago = IngresosData()
 container_servicios = ServiciosData()
-container_ordenes = OrdenesData()
+container_ordenes_home = OrdenesData()
 
 
-def actualizar_dashboard(e=None):
-    lista_clientes = manejo_cliente.cargar_clientes()
-    total_clientes = len(lista_clientes) if lista_clientes else 0
+def carga_tabla_ordenes():
+    ordenes = manejo_ordenes.cargar_ordenes()
+    ordenes.reverse()
+    for orden in ordenes:
+        row = ft.DataRow(
+            cells=[
+                ft.DataCell(ft.Text(orden["servicio"])),
+                ft.DataCell(ft.Text(orden["fecha"])),
+                ft.DataCell(ft.Text("alasdnmoa")),
+            ]
+        )
 
-    container_cliente.actualizar_clientes_totales(total_clientes)
+        container_ordenes_home.tabla.rows.append(row)
 
-    if container_cliente.page:
-        container_cliente.txt_total_clientes.update()
-    print(f"Clientes totales: {total_clientes}")
+    container_ordenes_home.tabla.update()
+
+
+def actualizar_dashboard(e):
+    try:
+        lista_clientes = manejo_cliente.cargar_clientes()
+        total_clientes = len(lista_clientes) if lista_clientes else 0
+        container_cliente.txt_total_clientes.value = str(total_clientes)
+        if container_cliente.page:
+            container_cliente.txt_total_clientes.update()
+        print(f"Clientes totales: {total_clientes}")
+    except Exception as ex:
+        print(f"Error al actualizar clientes totales {e}")
 
 
 # region VISTA
 class HomeUiState(ft.Container):
     def __init__(self):
-        super().__init__(**container_style, expand=True)
+        super().__init__(expand=True, padding=ft.padding.only(top=5))
         self.content = ft.Column(
             controls=[
                 ft.ResponsiveRow(
@@ -466,20 +446,12 @@ class HomeUiState(ft.Container):
                 ),
                 ft.ResponsiveRow(
                     controls=[
-                        ft.Container(
-                            content=container_pago,
-                            col=6,
-                            # offset=ft.transform.Offset(0, -0.31),
-                        ),
-                        ft.Column(
-                            controls=[
-                                ft.Container(
-                                    content=container_servicios,
-                                ),
-                                ft.Container(content=container_ordenes),
-                            ],
-                            col=6,
-                        ),
+                        # ft.Container(
+                        #     content=container_pago,
+                        #     col=6,
+                        # ),
+                        ft.Container(content=container_servicios, col=6),
+                        ft.Container(content=container_ordenes_home, col=6),
                     ]
                 ),
             ],
