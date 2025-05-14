@@ -125,7 +125,7 @@ class IngresosData(ft.Container):
             **container_style,
         )
 
-        self.pagos = manejo_pagos.cargar_pagos()
+        # self.pagos = manejo_pagos.cargar_pagos()
         self.pagos_dolares = 0
         self.pagos_bolivares = 0
 
@@ -205,30 +205,30 @@ class IngresosData(ft.Container):
             border_radius=5,
         )
         nuevo_grupo = []
-        for data in self.pagos:
-            monto = data["monto"]
-            if monto.startswith("Bs."):
-                monto_limpio = monto.replace("Bs.", "").strip().replace(" ", "")
-                print(monto_limpio)
-                valor = Decimal(monto_limpio)
-                self.pagos_bolivares += valor
-                print(valor)
-                barra_bs.to_y = float(self.pagos_bolivares)
-                barra_bs.tooltip = f"Bs. {self.pagos_bolivares}"
-
-            if monto.startswith("$"):
-                monto_limpio = monto.replace("$", "").replace(" ", "")
-                print(monto_limpio)
-                valor_usd = Decimal(monto_limpio)
-                self.pagos_dolares += valor_usd
-                # print(valor)
-                barra_dolar.to_y = float(self.pagos_dolares)
-                barra_dolar.tooltip = f"USD{self.pagos_dolares}"
-
-            if self.pagos_dolares > self.pagos_bolivares:
-                self.chart.max_y = self.pagos_dolares + 20
-            else:
-                self.chart.max_y = self.pagos_bolivares + 20
+        # for data in self.pagos:
+        #     monto = data["monto"]
+        #     if monto.startswith("Bs."):
+        #         monto_limpio = monto.replace("Bs.", "").strip().replace(" ", "")
+        #         print(monto_limpio)
+        #         valor = Decimal(monto_limpio)
+        #         self.pagos_bolivares += valor
+        #         print(valor)
+        #         barra_bs.to_y = float(self.pagos_bolivares)
+        #         barra_bs.tooltip = f"Bs. {self.pagos_bolivares}"
+        #
+        #     if monto.startswith("$"):
+        #         monto_limpio = monto.replace("$", "").replace(" ", "")
+        #         print(monto_limpio)
+        #         valor_usd = Decimal(monto_limpio)
+        #         self.pagos_dolares += valor_usd
+        #         # print(valor)
+        #         barra_dolar.to_y = float(self.pagos_dolares)
+        #         barra_dolar.tooltip = f"USD{self.pagos_dolares}"
+        #
+        #     if self.pagos_dolares > self.pagos_bolivares:
+        #         self.chart.max_y = self.pagos_dolares + 20
+        #     else:
+        #         self.chart.max_y = self.pagos_bolivares + 20
 
         grupo = [ft.BarChartGroup(x=1, bar_rods=[barra_bs, barra_dolar])]
         self.txt_total_semana.value = (
@@ -383,18 +383,18 @@ class OrdenesData(ft.Container):
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
         )
 
-    def actualizar_tabla(self, descripcion, fecha_entrega, estado):
-        row = ft.DataRow(
-            cells=[
-                ft.DataCell(ft.Text(descripcion)),
-                ft.DataCell(ft.Text(fecha_entrega)),
-                ft.DataCell(ft.Text(estado)),
-            ]
-        )
-
-        self.tabla.rows.insert(0, row)
-
-        self.tabla.update()
+    # def actualizar_tabla(self, descripcion, fecha_entrega, estado):
+    #     row = ft.DataRow(
+    #         cells=[
+    #             ft.DataCell(ft.Text(descripcion)),
+    #             ft.DataCell(ft.Text(fecha_entrega)),
+    #             ft.DataCell(ft.Text(estado)),
+    #         ]
+    #     )
+    #
+    #     self.tabla.rows.insert(0, row)
+    #
+    #     # self.tabla.update()
 
 
 # Instancias de clases

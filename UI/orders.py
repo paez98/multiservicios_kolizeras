@@ -1,21 +1,33 @@
 import flet as ft
+from typing import Optional
 from logica.manejo_servicio import ManejoServicio
 from logica.manejo_ordenes import ManejoOrdenes
+from logica.manejo_cliente import ManejoCliente
 from ui.home import container_ordenes_home
 
 
 class OrdenContainer(ft.Container):
-    def __init__(self, servicio, vehiculo: str, descripcion, fecha_limite):
+    def __init__(
+        self,
+        cliente,
+        servicio,
+        vehiculo: str,
+        descripcion,
+        fecha_orden,
+        estado,
+    ):
         super().__init__(
             border_radius=15,
             on_hover=self._on_hover,
             on_click=self.abrir_dialogo,
             animate_scale=ft.Animation(200, ft.AnimationCurve.EASE_IN_CIRC),
         )
+        self.cliente = cliente
         self.servicio = servicio
         self.vehiculo = vehiculo
         self.descripcion = descripcion
-        self.fecha_limite = fecha_limite
+        self.fecha_orden = fecha_orden
+        self.estado = estado
 
         self.base_content = ft.Card(
             elevation=5,
@@ -26,6 +38,12 @@ class OrdenContainer(ft.Container):
                         ft.Text(
                             self.servicio,
                             theme_style=ft.TextThemeStyle.TITLE_LARGE,
+                            weight=ft.FontWeight.BOLD,
+                            text_align=ft.TextAlign.CENTER,
+                        ),
+                        ft.Text(
+                            self.cliente,
+                            theme_style=ft.TextThemeStyle.TITLE_MEDIUM,
                             weight=ft.FontWeight.BOLD,
                             text_align=ft.TextAlign.CENTER,
                         ),
@@ -40,8 +58,9 @@ class OrdenContainer(ft.Container):
                             no_wrap=True,
                             text_align=ft.TextAlign.CENTER,
                         ),
-                        # Fecha de entrega
-                        ft.Text(self.fecha_limite, text_align=ft.TextAlign.RIGHT),
+                        ft.Text(self.fecha_orden),
+                        # Estado
+                        ft.Text(self.estado, text_align=ft.TextAlign.RIGHT),
                     ],
                     spacing=5,
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
@@ -54,7 +73,7 @@ class OrdenContainer(ft.Container):
         # -----DIALOGO MODAL-----
         self.detalles_dialogo = ft.AlertDialog(
             modal=True,
-            title=ft.Text(f"Detalles Orden: {self.vehiculo.capitalize()}"),
+            title=ft.Text(f"Detalles Orden: {self.vehiculo}"),
             content=ft.Container(
                 width=400,
                 padding=10,
@@ -91,7 +110,7 @@ class OrdenContainer(ft.Container):
                                 ft.Text("Fecha Límite:", weight=ft.FontWeight.BOLD),
                             ]
                         ),
-                        ft.Text(self.fecha_limite),
+                        ft.Text(self.estado),
                     ],
                     spacing=5,
                     scroll=ft.ScrollMode.ADAPTIVE,
@@ -136,10 +155,24 @@ class AgregarOrden(ft.Container):
 
         self.manejo_servicios = ManejoServicio()
         self.manejo_ordenes = ManejoOrdenes()
+        self.manejo_clientes = ManejoCliente()
 
         # -------CAMPOS DE TEXTO-------
         self.dd_servicio = ft.Dropdown(
-            label="Servicio", enable_filter=True, editable=True, options=[]
+            label="Servicio",
+            enable_filter=True,
+            editable=True,
+            options=[],
+            col=6,
+            width=200,
+        )
+        self.dd_cliente = ft.Dropdown(
+            label="Cliente",
+            enable_filter=True,
+            editable=True,
+            options=[],
+            col=6,
+            width=200,
         )
         self.txt_mecanico = ft.TextField(label="Mecanico", col=6)
 
@@ -151,7 +184,7 @@ class AgregarOrden(ft.Container):
             multiline=True,
             max_lines=7,
         )
-        self.txt_fecha = ft.TextField(label="Fecha de entrega", col=6)
+        self.txt_estado = ft.TextField(label="Estado", col=6)
 
         # -------BOTONES-------
         self.btn_registrar = ft.ElevatedButton("Registrar", on_click=self.agregar_orden)
@@ -167,10 +200,10 @@ class AgregarOrden(ft.Container):
                 width=400,  # Puedes darle un ancho fijo al contenido si quieres
                 content=ft.Column(
                     [
-                        self.dd_servicio,
+                        ft.Row([self.dd_servicio, self.dd_cliente]),
                         self.txt_vehiculo,
                         self.txt_descripcion,
-                        self.txt_fecha,
+                        self.txt_estado,
                     ],
                     spacing=15,  # Añadir algo de espacio entre campos
                 ),
@@ -188,14 +221,6 @@ class AgregarOrden(ft.Container):
             bgcolor=ft.Colors.with_opacity(0.8, ft.Colors.GREY_800),
             border_radius=15,
         )
-        self.cargar_dropdown()
-
-    # -----Metodos-----
-    def cargar_dropdown(self):
-        servicios = self.manejo_servicios.cargar_servicios()
-        self.dd_servicio.options = [
-            ft.dropdown.Option(text=servicio["descripcion"]) for servicio in servicios
-        ]
 
     def _on_hover(self, e):
         container = e.control
@@ -221,47 +246,61 @@ class AgregarOrden(ft.Container):
         e.control.page.overlay.append(self.dialogo)
         self.dialogo.open = True
         e.control.page.update()
+        self.cargar_dds()
+
+    def cargar_dds(self):
+        clientes = self.manejo_clientes.cargar_clientes()
+        servicios = self.manejo_servicios.cargar_servicios()
+
+        # DD SERVICIOS
+        self.dd_servicio.options = [
+            ft.dropdown.Option(
+                text=servicio.get("descripcion", ""), key=str(servicio.get("id", ""))
+            )
+            for servicio in servicios
+        ]
+        self.dd_servicio.update()
+
+        # DD CLIENTES
+        self.dd_cliente.options = [
+            ft.dropdown.Option(
+                key=cliente.get("id", ""), text=cliente.get("nombre", "")
+            )
+            for cliente in clientes
+        ]
+        self.dd_cliente.update()
 
     def agregar_orden(self, e):
-        self.manejo_ordenes.guardar_orden(
+        orden_guardada = self.manejo_ordenes.guardar_orden(
+            cliente=self.dd_cliente.value.strip(),
             servicio=self.dd_servicio.value.strip(),
             vehiculo=self.txt_vehiculo.value.strip(),
             descripcion=self.txt_descripcion.value.strip(),
-            fecha=self.txt_fecha.value.strip(),
+            estado=self.txt_estado.value.strip(),
         )
-        orden = OrdenContainer(
-            servicio=self.dd_servicio.value.capitalize(),
-            vehiculo=self.txt_vehiculo.value.capitalize(),
-            descripcion=self.txt_descripcion.value.capitalize(),
-            fecha_limite=self.txt_fecha.value.capitalize(),
-        )
+        if orden_guardada:
+            orden = OrdenContainer(
+                cliente=orden_guardada.get(
+                    "cliente_nombre", ""
+                ),  # O el nombre del cliente si lo devuelves
+                servicio=orden_guardada.get(
+                    "servicio_nombre", ""
+                ),  # O la descripción del servicio si la devuelves
+                vehiculo=orden_guardada.get(
+                    "vehiculo", ""
+                ),  # Viene directamente de la API
+                descripcion=orden_guardada.get("descripcion", ""),  # Viene de la API
+                fecha_orden=orden_guardada.get(
+                    "fecha_orden", ""
+                ),  # <--- ¡Obtén la fecha del API!
+                estado=orden_guardada.get("estado", ""),
+            )
+            container_ordenes_ui.grid.controls.insert(1, orden)
 
-        container_ordenes_ui.grid.controls.insert(1, orden)
         e.page.overlay[-1].open = False
         e.page.update()
         e.page.overlay.pop()
         container_ordenes_ui.grid.update()
-        print("asdasdasd")
-
-        container_ordenes_home.actualizar_tabla(
-            self.dd_servicio.value,
-            self.txt_fecha.value,
-            "parao",
-        )
-
-    # def cargar_ordenes(self):
-    #     ordenes = self.manejo_ordenes.cargar_ordenes()
-    #     ordenes.reverse()
-    #     for datos in ordenes:
-    #         orden = OrdenContainer(
-    #             datos["servicio"],
-    #             datos["vehiculo"],
-    #             datos["descripcion"],
-    #             datos["fecha"],
-    #         )
-    #         container_ordenes_ui.grid.controls.append(orden)
-    #
-    #     container_ordenes_ui.grid.update()
 
 
 add_container = AgregarOrden()
@@ -274,10 +313,12 @@ def cargar_orden(e):
     ordenes.reverse()
     for datos in ordenes:
         orden = OrdenContainer(
-            datos["servicio"],
-            datos["vehiculo"],
-            datos["descripcion"],
-            datos["fecha"],
+            datos.get("cliente_nombre", ""),
+            datos.get("servicio_nombre", ""),
+            datos.get("vehiculo", ""),
+            datos.get("descripcion", ""),
+            datos.get("fecha_orden", ""),
+            datos.get("estado", ""),
         )
         container_ordenes_ui.grid.controls.append(orden)
         container_ordenes_ui.grid.update()

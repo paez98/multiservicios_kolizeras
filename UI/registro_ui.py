@@ -1,4 +1,6 @@
 import flet as ft
+import requests
+from typing import Optional
 from utils.utils import crear_campo_texto
 from logica.manejo_cliente import ManejoCliente
 from logica.manejo_servicio import ManejoServicio
@@ -22,6 +24,12 @@ def guardar_cliente_desde_dialogo(e, txt_nombre, txt_contacto, txt_direccion):
     """Guarda un cliente desde el diálogo modal."""
     errores = validar_campos(txt_nombre.value.strip(), txt_contacto.value.strip())
 
+    nombre_ingresado = txt_nombre.value  # Obtén el valor del campo de texto del nombre
+    telefono_ingresado = (
+        txt_contacto.value
+    )  # Obtén el valor del campo de texto del teléfono
+    direccion_ingresada = txt_direccion.value
+
     if errores:
         txt_nombre.error_text = errores.get("nombre", "")
         txt_contacto.error_text = errores.get("contacto", "")
@@ -30,11 +38,18 @@ def guardar_cliente_desde_dialogo(e, txt_nombre, txt_contacto, txt_direccion):
         return
 
     # Guardar el cliente
-    manejo_cliente.guardar_cliente(
-        txt_nombre.value.strip(),
-        txt_contacto.value.strip(),
-        txt_direccion.value.strip(),
+    dato_guardado = manejo_cliente.guardar_cliente(
+        nombre_ingresado, telefono_ingresado, direccion_ingresada
     )
+    print(f"Este es mi print {dato_guardado}")
+    if isinstance(dato_guardado, dict) and "errors" in dato_guardado:
+        errores_api = dato_guardado["errors"]
+
+        if "telefono" in errores_api:
+            txt_contacto.error_text = "Ya existe un cliente con este telefono"
+            txt_contacto.update()
+            print(f"Error de telefono desde API: {errores_api['telefono'][0]}")
+        return
     actualizar_dashboard(e)
 
     # Cerrar el diálogo
@@ -125,7 +140,9 @@ def validar_campos_servicio(descripcion: str, precio: str):
     return errores
 
 
-def guardar_desde_dialogo(e, txt_descripcion, txt_precio):
+def guardar_desde_dialogo(
+    e, txt_descripcion, txt_precio, page: Optional[ft.Page] = None
+):
     errores = validar_campos_servicio(
         txt_descripcion.value.strip(), txt_precio.value.strip()
     )
@@ -135,13 +152,26 @@ def guardar_desde_dialogo(e, txt_descripcion, txt_precio):
         txt_descripcion.update()
         txt_precio.update()
         return
-    monto_completo = f"{txt_precio.prefix_text + txt_precio.value}"
-    manejo_servicio.guardar_servicio(
-        txt_descripcion.value.strip(), monto_completo.strip()
+
+    servicio_creado = manejo_servicio.guardar_servicio(
+        txt_descripcion.value.strip(), txt_precio.value.strip()
     )
-    e.page.overlay[-1].open = False  # Cierra el último diálogo en el overlay
-    e.page.update()
-    e.page.overlay.pop()
+
+    # manejo_servicio.cargar_servicios()
+
+    dlg_modal = None
+    if page.overlay and isinstance(page.overlay[-1], ft.AlertDialog):
+        dlg_modal = page.overlay[-1]
+
+    if dlg_modal:
+        dlg_modal.open = False
+
+    if servicio_creado:
+        snack_bar_control = ft.SnackBar(ft.Text("¡Servicio registrado con éxito!"))
+
+    page.overlay.append(snack_bar_control)
+    snack_bar_control.open = True
+    page.update()
 
 
 def crear_dialogo_agregar_servicio(e):
@@ -172,7 +202,7 @@ def crear_dialogo_agregar_servicio(e):
                 "Guardar",
                 style=ft.ButtonStyle(bgcolor="green", color="white"),
                 on_click=lambda e: guardar_desde_dialogo(
-                    e, txt_descripcion, txt_precio
+                    e, txt_descripcion, txt_precio, e.page
                 ),
             ),
             ft.TextButton(

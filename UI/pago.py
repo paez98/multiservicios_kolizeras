@@ -1,4 +1,6 @@
 import datetime
+import json
+import requests
 import flet as ft
 from decimal import Decimal
 from typing import Optional
@@ -113,11 +115,12 @@ class PagoUiState:
                 padding=ft.padding.all(10),
             ),
             on_click=lambda e: self._guardar_pagos(
-                nombre=self.dd_cliente,
+                cliente=self.dd_cliente,
                 servicio=self.dd_servicio,
+                metodo=self.dd_metodo,
                 monto=self.txt_monto,
                 referencia=self.txt_referencia,
-                fecha=self.txt_fecha,
+                fecha_control=self.txt_fecha,
                 page=e.page,
             ),
             col={"sm": 12, "lg": 1.5},
@@ -136,8 +139,9 @@ class PagoUiState:
         # DataTable de pagos
         self.lista_de_pago = ft.DataTable(
             columns=[
-                ft.DataColumn(ft.Text("Nombre")),
+                ft.DataColumn(ft.Text("Cliente")),
                 ft.DataColumn(ft.Text("Servicio")),
+                ft.DataColumn(ft.Text("Metodo")),
                 ft.DataColumn(ft.Text("Monto")),
                 ft.DataColumn(ft.Text("Referencia")),
                 ft.DataColumn(ft.Text("Fecha")),
@@ -146,8 +150,6 @@ class PagoUiState:
             expand=True,
             border=ft.border.all(1, ft.Colors.GREY_300),
         )
-        self._cargar_clientes_dropdown()
-        self._cargar_servicios_dropdown()
 
     # region METODOS
 
@@ -156,8 +158,9 @@ class PagoUiState:
         e.control.page.open(self.fecha_de_pago)
 
     def _seleccionar_fecha(self, e):
-        self.txt_fecha.value = f"{self.fecha_de_pago.value.strftime('%d-%m-%Y')}"
+        self.txt_fecha.value = self.fecha_de_pago.value.strftime("%Y-%m-%d")
 
+        print(type(self.txt_fecha.value))
         e.control.page.update()
 
     @staticmethod
@@ -175,54 +178,67 @@ class PagoUiState:
         return error
 
     def _guardar_pagos(
-        self, nombre, servicio, monto, referencia, fecha, page: Optional[ft.Page] = None
+        self,
+        cliente,
+        servicio,
+        metodo,
+        monto,
+        referencia,
+        fecha_control,
+        page: Optional[ft.Page] = None,
     ):
         errores = self._validar_registro_pago(
-            dd_cliente=nombre, dd_servicio=servicio, txt_fecha=fecha
+            dd_cliente=cliente, dd_servicio=servicio, txt_fecha=fecha_control
         )
 
         if errores:
-            nombre.error_text = errores.get("nombre", "")
+            cliente.error_text = errores.get("nombre", "")
             servicio.error_text = errores.get("servicio", "")
-            fecha.error_text = errores.get("fecha", "")
-            nombre.update()
+            fecha_control.error_text = errores.get("fecha", "")
+            cliente.update()
             servicio.update()
-            fecha.update()
+            fecha_control.update()
             return
 
-        nombre_val = nombre.value
+        cliente_val = cliente.value
         servicio_val = servicio.value
-        monto_val = f"{monto.prefix.value} {monto.value}"
+        metodo_val = metodo.value
+        monto_val = str(monto.value)
         ref_val = referencia.value
-        fecha_val = fecha.value
-
+        fecha_val = fecha_control.value
         print(
-            f"Intentando guardar pago. Nombre: {nombre_val}, Servicio: {servicio_val}, Monto: {monto_val}, Fecha: {fecha_val}"
+            f"evaluamos el pago: {servicio_val} {metodo_val} {monto_val} {ref_val} {fecha_val}"
         )
+
         try:
             response = self.manejo_pago.guardar_pago(
-                nombre_val, servicio_val, monto_val, ref_val, fecha_val
+                cliente_val,
+                servicio_val,
+                metodo_val,
+                monto_val,
+                ref_val,
+                fecha_val,
             )
             print(f"Pago guardado exitosamente {response}")
 
             # Limpiamos los campos
             print("Limpiando campos del formulario")
-            nombre.value = None
+            cliente.value = None
             servicio.value = None
             monto.value = ""
-            fecha.value = ""
+            self.txt_fecha.value = ""
             referencia.value = ""
 
             # Limpiamos los errores
-            nombre.error_text = None
+            cliente.error_text = None
             servicio.error_text = None
             monto.error_text = None
-            fecha.error_text = None
+            self.txt_fecha.error_text = None
 
-            nombre.update()
+            cliente.update()
             servicio.update()
             monto.update()
-            fecha.update()
+            self.txt_fecha.update()
             referencia.update()
 
             page.open(ft.SnackBar(ft.Text("¡Pago registrado con éxito!")))
@@ -236,23 +252,29 @@ class PagoUiState:
             return None
 
     def _cargar_servicios_dropdown(self):
+
         servicios = self.manejo_servicio.cargar_servicios()
         self.dd_servicio.options = [
             ft.dropdown.Option(
-                text=servicio["descripcion"],
-                data=servicio["precio"],  # Almacenamos el precio en el data
+                text=servicio.get("descripcion", ""),
+                key=str(servicio.get("id", "")),
+                data=servicio.get("precio", ""),
             )
             for servicio in servicios
         ]
+        self.dd_servicio.update()
 
     def _cargar_clientes_dropdown(self):
         clientes = self.manejo_cliente.cargar_clientes()
+
         self.dd_cliente.options = [
             ft.dropdown.Option(
+                key=cliente["id"],
                 text=cliente["nombre"],
             )
             for cliente in clientes
         ]
+        self.dd_cliente.update()
 
     def actualizar_monto_servicio(self, e):
         """Actualiza el monto cuando se selecciona un servicio"""
@@ -264,7 +286,7 @@ class PagoUiState:
                 next(
                     option.data
                     for option in self.dd_servicio.options
-                    if option.text == self.dd_servicio.value
+                    if option.key == self.dd_servicio.value
                 )
             )
 
@@ -300,11 +322,12 @@ def _cargar_pagos(e, state: PagoUiState):
         state.lista_de_pago.rows = [
             ft.DataRow(
                 cells=[
-                    ft.DataCell(ft.Text(pago["nombre"])),
-                    ft.DataCell(ft.Text(pago["servicio"])),
-                    ft.DataCell(ft.Text(pago["monto"])),
-                    ft.DataCell(ft.Text(pago["referencia"])),
-                    ft.DataCell(ft.Text(pago["fecha"])),
+                    ft.DataCell(ft.Text(pago.get("cliente_nombre", ""))),
+                    ft.DataCell(ft.Text(pago.get("servicio_nombre", ""))),
+                    ft.DataCell(ft.Text(pago.get("metodo", ""))),
+                    ft.DataCell(ft.Text(pago.get("monto", ""))),
+                    ft.DataCell(ft.Text(pago.get("referencia", ""))),
+                    ft.DataCell(ft.Text(pago.get("fecha_pago", ""))),
                 ]
             )
             for pago in pagos

@@ -1,5 +1,6 @@
 flet[all]
 supabase
 dotenv
-faker
+pyBCV
+
 

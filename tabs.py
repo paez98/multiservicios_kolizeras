@@ -15,7 +15,7 @@ ordenes_cargadas = False
 
 
 def cargar_datos_pestana(e):
-    global clientes_cargados, servicios_cargados, pagos_cargados, dashboard_cargado, ordenes_cargadas
+    global clientes_cargados, servicios_cargados, pagos_cargados, ordenes_cargadas
     tab_index = e.control.selected_index
 
     # if tab_index == 0 and not dashboard_cargado:
@@ -34,7 +34,7 @@ def cargar_datos_pestana(e):
         clientes_cargados = True
         fin_timer_clientes = time.time()
         print(
-            f"El tiempo de ejecucion de carga de clientes es{fin_timer_clientes - inicio_timer_clientes}"
+            f"El tiempo de ejecucion de carga de clientes es {fin_timer_clientes - inicio_timer_clientes}"
         )
     elif tab_index == 1 and not servicios_cargados:
         inicio_timer_servicios = time.time()
@@ -50,16 +50,19 @@ def cargar_datos_pestana(e):
         ordenes_cargadas = True
         fin_timer_ordenes = time.time()
         print(
-            f"El tiempo de ejecucion de carga de ordenes es{fin_timer_ordenes - inicio_timer_ordenes} "
+            f"El tiempo de ejecucion de carga de ordenes es {fin_timer_ordenes - inicio_timer_ordenes} "
         )
 
     elif tab_index == 3 and not pagos_cargados:
         inicio_timer_pagos = time.time()
+        pago_state._cargar_servicios_dropdown()
+        pago_state._cargar_clientes_dropdown()
         _cargar_pagos(e, pago_state)
+
         pagos_cargados = True
         fin_timer_pagos = time.time()
         print(
-            f"El tiempo de ejecucion de carga de pagos {fin_timer_pagos - inicio_timer_pagos}"
+            f"El tiempo de ejecucion de carga de pagos es {fin_timer_pagos - inicio_timer_pagos}"
         )
 
 
@@ -67,11 +70,11 @@ tabs = ft.Tabs(
     selected_index=0,
     animation_duration=300,
     tabs=[
-        ft.Tab(
-            text="DashBoard",
-            icon=ft.Icons.HOME,
-            content=home,
-        ),
+        # ft.Tab(
+        #     text="DashBoard",
+        #     icon=ft.Icons.HOME,
+        #     content=home,
+        # ),
         ft.Tab(text="Clientes", icon=ft.Icons.PEOPLE_ALT, content=vista_clientes),
         ft.Tab(
             text="Servicios",

@@ -135,7 +135,7 @@ def _eliminar_servicio(e, state: ServicioUiState):
     def confirmar_eliminacion(e):
         try:
             state.manejo.eliminar_servicio(servicio_id)
-            _cargar_servicio(e, state)
+            # _cargar_servicio(e, state)
             e.page.overlay[-1].open = False
             e.page.update()
         except Exception as e:
@@ -162,7 +162,7 @@ def edit(e, state: ServicioUiState):
                 datos_actualizados["descripcion"],
                 datos_actualizados["precio"],
             )
-            _cargar_servicio(e, state)  # Refrescar la tabla
+            # _cargar_servicio(e, state)  # Refrescar la tabla
         except Exception as error:
             print(f"Error al editar cliente: {error}")
 

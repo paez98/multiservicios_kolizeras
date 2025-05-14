@@ -1,36 +1,45 @@
+import requests
+from config import API_BASE_URL
 from client_supabase import supabase
 
 
 class ManejoOrdenes:
     def __init__(self):
-        self.table_name = "orden"
-        self.db_client = supabase
+        self.api_url = f"{API_BASE_URL}orden/"
 
     def cargar_ordenes(self):
         try:
-            response = self.db_client.table(self.table_name).select("*").execute()
-            return response.data
+            try:
+                response = requests.get(f"{API_BASE_URL}orden")
+                response.raise_for_status()
+            except requests.ConnectionError:
+                print("Error de conexción: No se puedo conectar al sevidor")
+                return []
+            except requests.HTTPError as htto_err:
+                print(f"Error HTTP:{htto_err}")
+                return []
+            return response.json()
         except Exception as e:
-            print(f"Error al cargar las ordenes{e}")
-            return []
+            print(f"Error al cargar los pagos: {e}")
 
-    def guardar_orden(self, servicio, vehiculo, descripcion, fecha):
+    def guardar_orden(self, cliente, servicio, vehiculo, descripcion, estado):
+        datos_orden = {
+            "cliente": cliente,
+            "servicio": servicio,
+            "vehiculo": vehiculo,
+            "descripcion": descripcion,
+            "estado": estado,
+        }
 
         try:
-            response = (
-                self.db_client.table(self.table_name)
-                .insert(
-                    {
-                        "servicio": servicio,
-                        "vehiculo": vehiculo,
-                        "descripcion": descripcion,
-                        "fecha": fecha,
-                    }
-                )
-                .execute()
-            )
-            print(f"Orden creada exitoxamente {response}")
-            return response.data
+            response = requests.post(self.api_url, json=datos_orden)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.HTTPError as http_err:
+            print(f"Error al guardar {http_err}")
+            print(f"detalle de error, {http_err.response.json()}")
+            return
+
         except Exception as e:
             print(f"Error al crear la orden{e}")
             return None

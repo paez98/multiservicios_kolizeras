@@ -1,6 +1,8 @@
 import flet as ft
 from typing import Optional
 
+from logica.manejo_cliente import ManejoCliente
+
 
 class DialogHandler:
     def __init__(self):
@@ -30,34 +32,53 @@ class DialogHandler:
         page.update()
 
     @staticmethod
-    def crear_dialogo_edicion(page, cliente_data: dict, on_edit):
+    def crear_dialogo_edicion(
+        page,
+        cliente_data: dict,
+        manejo_cliente: ManejoCliente,
+        on_edit: Optional[callable] = None,
+    ):
         def cerrar_dialogo(e):
-            e.page.overlay[-1].open = False
-            e.page.update()
-            e.page.overlay.pop()
+            if page.overlay and isinstance(page.overlay[-1], ft.AlertDialog):
+                page.overlay[-1].open = False  # Marcar para cerrar
+                page.update()  # Actualizar la UI para ocultarlo
+                # page.overlay.pop()  # Eliminar del stack (después de actualizar)
 
         # Creamos los campos de texto con los datos del cliente
         txt_nombre = crear_campo_texto(
-            label="Nombre y Apellido", value=cliente_data["Nombre"]
+            label="Nombre y Apellido", value=cliente_data.get("Nombre", "")
         )
         txt_telefono = crear_campo_texto(
-            label="Telefono", value=cliente_data["Telefono"]
+            label="Telefono", value=cliente_data.get("Telefono", "")
         )
         txt_direccion = crear_campo_texto(
-            label="Dirección", value=cliente_data["Direccion"]
+            label="Dirección", value=cliente_data.get("Direccion", "")
         )
 
         def confirmacion(e):
-            on_edit(
-                {
-                    "id": cliente_data["Id"],
-                    "nombre": txt_nombre.value,
-                    "telefono": txt_telefono.value,
-                    "direccion": txt_direccion.value,
-                }
+            datos_actualizados = {
+                "id": cliente_data.get("Id"),
+                "nombre": txt_nombre.value.strip(),
+                "telefono": txt_telefono.value.strip(),
+                "direccion": txt_direccion.value,
+            }
+            resultado_edicion = manejo_cliente.editar_cliente(
+                datos_actualizados["id"],
+                datos_actualizados["nombre"],
+                datos_actualizados["telefono"],
+                datos_actualizados["direccion"],
             )
-
-            cerrar_dialogo(e)
+            if isinstance(resultado_edicion, dict) and "errors" in resultado_edicion:
+                errores_api = resultado_edicion["errors"]
+                if "telefono" in errores_api:
+                    txt_telefono.error_text = "Este numero ya esta registrado"
+                    txt_telefono.update()
+                return
+            else:
+                cerrar_dialogo(e)
+                page.open(ft.SnackBar(ft.Text("Cliente editado exitosamente")))
+                if on_edit:
+                    on_edit()
 
         dialogo = ft.AlertDialog(
             modal=True,
