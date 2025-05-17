@@ -127,3 +127,4 @@ class ManejoCliente:
             return True
         except Exception as e:
             print(f"Error al eliminar el cliente: {e}")
+            return e

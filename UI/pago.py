@@ -83,7 +83,7 @@ class PagoUiState:
 
         self.dd_metodo = ft.Dropdown(
             label="Metodo",
-            options=[ft.DropdownOption("Pagomovil"), ft.DropdownOption("$")],
+            options=[ft.DropdownOption("Pagomovil"), ft.DropdownOption("USD")],
             border_color="#9C27B0",
             col={"sm": 12, "lg": 1.5},
         )

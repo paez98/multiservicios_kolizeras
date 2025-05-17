@@ -4,7 +4,6 @@ from typing import Optional
 from utils.utils import crear_campo_texto
 from logica.manejo_cliente import ManejoCliente
 from logica.manejo_servicio import ManejoServicio
-from .home import actualizar_dashboard
 
 manejo_cliente = ManejoCliente()
 
@@ -50,7 +49,6 @@ def guardar_cliente_desde_dialogo(e, txt_nombre, txt_contacto, txt_direccion):
             txt_contacto.update()
             print(f"Error de telefono desde API: {errores_api['telefono'][0]}")
         return
-    actualizar_dashboard(e)
 
     # Cerrar el diálogo
     e.page.overlay[-1].open = False  # Cierra el último diálogo en el overlay

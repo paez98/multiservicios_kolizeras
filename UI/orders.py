@@ -1,20 +1,19 @@
 import flet as ft
-from typing import Optional
 from logica.manejo_servicio import ManejoServicio
 from logica.manejo_ordenes import ManejoOrdenes
 from logica.manejo_cliente import ManejoCliente
-from ui.home import container_ordenes_home
 
 
 class OrdenContainer(ft.Container):
     def __init__(
-        self,
-        cliente,
-        servicio,
-        vehiculo: str,
-        descripcion,
-        fecha_orden,
-        estado,
+            self,
+            orden_id,
+            cliente,
+            servicio,
+            vehiculo,
+            descripcion,
+            fecha_orden,
+            estado,
     ):
         super().__init__(
             border_radius=15,
@@ -22,6 +21,11 @@ class OrdenContainer(ft.Container):
             on_click=self.abrir_dialogo,
             animate_scale=ft.Animation(200, ft.AnimationCurve.EASE_IN_CIRC),
         )
+        self.manejo_orden = ManejoOrdenes()
+        self.manejo_cliente = ManejoCliente()
+        self.manejo_servicio = ManejoServicio()
+
+        self.orden_id = orden_id
         self.cliente = cliente
         self.servicio = servicio
         self.vehiculo = vehiculo
@@ -29,38 +33,46 @@ class OrdenContainer(ft.Container):
         self.fecha_orden = fecha_orden
         self.estado = estado
 
+        # --- Controles para el base_content---
+        self._txt_servicio_card = ft.Text(
+            self.servicio,
+            theme_style=ft.TextThemeStyle.TITLE_LARGE,
+            weight=ft.FontWeight.BOLD,
+            text_align=ft.TextAlign.CENTER,
+        )
+        self._txt_cliente_card = ft.Text(
+            self.cliente,
+            theme_style=ft.TextThemeStyle.TITLE_MEDIUM,
+            weight=ft.FontWeight.BOLD,
+            text_align=ft.TextAlign.CENTER,
+        )
+        self._txt_vehiculo_card = ft.Text(
+            self.vehiculo, theme_style=ft.TextThemeStyle.TITLE_MEDIUM
+        )
+        self._txt_descripcion_card = ft.Text(
+            self.descripcion,
+            overflow=ft.TextOverflow.ELLIPSIS,
+            max_lines=3,
+            no_wrap=False,
+            text_align=ft.TextAlign.CENTER,
+        )
+        self._txt_fecha_orden_card = ft.Text(self.fecha_orden)
+        self._txt_estado_card = ft.Text(self.estado, text_align=ft.TextAlign.RIGHT)
+
         self.base_content = ft.Card(
             elevation=5,
             content=ft.Container(
                 content=ft.Column(
                     [
                         # Servicio a realizar
-                        ft.Text(
-                            self.servicio,
-                            theme_style=ft.TextThemeStyle.TITLE_LARGE,
-                            weight=ft.FontWeight.BOLD,
-                            text_align=ft.TextAlign.CENTER,
-                        ),
-                        ft.Text(
-                            self.cliente,
-                            theme_style=ft.TextThemeStyle.TITLE_MEDIUM,
-                            weight=ft.FontWeight.BOLD,
-                            text_align=ft.TextAlign.CENTER,
-                        ),
+                        self._txt_servicio_card,
+                        self._txt_cliente_card,
                         # Vehiculo
-                        ft.Text(
-                            self.vehiculo, theme_style=ft.TextThemeStyle.TITLE_MEDIUM
-                        ),
-                        ft.Text(
-                            self.descripcion,
-                            overflow=ft.TextOverflow.ELLIPSIS,
-                            max_lines=5,
-                            no_wrap=True,
-                            text_align=ft.TextAlign.CENTER,
-                        ),
-                        ft.Text(self.fecha_orden),
+                        self._txt_vehiculo_card,
+                        self._txt_descripcion_card,
+                        self._txt_fecha_orden_card,
                         # Estado
-                        ft.Text(self.estado, text_align=ft.TextAlign.RIGHT),
+                        self._txt_estado_card,
                     ],
                     spacing=5,
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
@@ -70,23 +82,65 @@ class OrdenContainer(ft.Container):
         )
 
         self.content = self.base_content
-        # -----DIALOGO MODAL-----
+
+        self._txt_dialog_vehiculo_title = ft.Text(
+            f"Orden N⁰ {self.orden_id}:    {self.vehiculo}", weight=ft.FontWeight.BOLD
+        )
+        self._txt_dialog_servicio_value = ft.Text(self.servicio)
+        self._txt_dialog_cliente_value = ft.Text(self.cliente)
+        self._txt_dialog_descripcion_value = ft.Text(self.descripcion)
+        self._txt_dialog_fecha_orden_value = ft.Text(self.fecha_orden)
+        self._txt_dialog_estado_value = ft.Text(self.estado)
+
+        # -----DIALOGO DETALLES ORDEN-----
         self.detalles_dialogo = ft.AlertDialog(
             modal=True,
-            title=ft.Text(f"Detalles Orden: {self.vehiculo}"),
+            title=self._txt_dialog_vehiculo_title,
             content=ft.Container(
                 width=400,
                 padding=10,
                 content=ft.Column(
                     [
-                        # Sección Servicio
                         ft.Row(
                             [
-                                ft.Icon(ft.Icons.MISCELLANEOUS_SERVICES),
-                                ft.Text("Servicio:", weight=ft.FontWeight.BOLD),
-                            ]
+                                ft.Container(
+                                    content=ft.Column(
+                                        [
+                                            ft.Row(
+                                                [
+                                                    ft.Icon(
+                                                        ft.Icons.MISCELLANEOUS_SERVICES
+                                                    ),
+                                                    ft.Text(
+                                                        "Servicio:",
+                                                        weight=ft.FontWeight.BOLD,
+                                                    ),
+                                                ]
+                                            ),
+                                            self._txt_dialog_servicio_value,  # Usar la referencia
+                                        ]
+                                    )
+                                ),
+                                ft.Container(
+                                    content=ft.Column(
+                                        [
+                                            ft.Row(
+                                                [
+                                                    ft.Icon(ft.Icons.PERSON),
+                                                    ft.Text(
+                                                        "Cliente:",
+                                                        weight=ft.FontWeight.BOLD,
+                                                    ),
+                                                ]
+                                            ),
+                                            self._txt_dialog_cliente_value,  # Usar la referencia
+                                        ]
+                                    )
+                                ),
+                            ],
+                            alignment=ft.MainAxisAlignment.SPACE_AROUND,
                         ),
-                        ft.Text(self.servicio),
+                        # Sección Servicio
                         ft.Divider(height=10, color=ft.Colors.TRANSPARENT),
                         # Sección Descripción
                         ft.Row(
@@ -99,29 +153,98 @@ class OrdenContainer(ft.Container):
                             ]
                         ),
                         ft.Container(
-                            content=ft.Text(self.descripcion),
-                            padding=ft.padding.only(left=5),
+                            content=ft.Column(
+                                [
+                                    self._txt_dialog_descripcion_value
+                                ],  # Usar la referencia
+                                scroll=ft.ScrollMode.ADAPTIVE,
+                            ),
+                            padding=ft.padding.all(8),
+                            height=150,
+                            border_radius=5,
                         ),
                         ft.Divider(height=10, color=ft.Colors.TRANSPARENT),
                         # Sección Fecha Límite
                         ft.Row(
                             [
                                 ft.Icon(ft.Icons.EVENT_AVAILABLE),
-                                ft.Text("Fecha Límite:", weight=ft.FontWeight.BOLD),
+                                ft.Text("Fecha de Orden:", weight=ft.FontWeight.BOLD),
                             ]
                         ),
-                        ft.Text(self.estado),
+                        self._txt_dialog_fecha_orden_value,  # Usar la referencia
+                        ft.Divider(height=10, color=ft.Colors.TRANSPARENT),
+                        ft.Row(
+                            [
+                                ft.Icon(ft.Icons.TIMELAPSE),
+                                ft.Text("Estado de Orden:", weight=ft.FontWeight.BOLD),
+                            ]
+                        ),
+                        self._txt_dialog_estado_value,  # Usar la referencia
                     ],
                     spacing=5,
                     scroll=ft.ScrollMode.ADAPTIVE,
-                    height=300,
+                    height=400,
                 ),
             ),
-            actions=[ft.TextButton("Cerrar", on_click=self.close_dialogo)],
+            actions=[
+                ft.TextButton(
+                    "Eliminar",
+                    style=ft.ButtonStyle(color=ft.Colors.RED_300),
+                    on_click=lambda e: self.eliminar_orden(e),
+                ),
+                ft.TextButton(
+                    "Editar",
+                    style=ft.ButtonStyle(color=ft.Colors.YELLOW_300),
+                    on_click=lambda e: self.abrir_dialogo_edicion(e),
+                ),
+                ft.TextButton("Cerrar", on_click=self.close_dialogo),
+            ],
+            actions_alignment=ft.MainAxisAlignment.END,
+        )
+        # ----- CONTROLES PARA EL DIALOGO DE EDICION -----
+        # Los hacemos atributos para poder acceder a sus valores al guardar
+        self._edit_dd_cliente = ft.Dropdown(
+            label="Cliente", enable_filter=True, editable=True, options=[], expand=True
+        )
+        self._edit_dd_servicio = ft.Dropdown(
+            label="Servicio", enable_filter=True, editable=True, options=[], expand=True
+        )
+        self._edit_txt_vehiculo = ft.TextField(label="Vehículo")
+        self._edit_txt_descripcion = ft.TextField(
+            label="Descripción", multiline=True, max_lines=7
+        )
+        self._edit_txt_estado = ft.TextField(label="Estado")
+
+        # ----- DIALOGO DE EDICION -----
+        self.dialogo_edicion = ft.AlertDialog(
+            modal=True,
+            title=ft.Text("Editar Orden"),
+            content=ft.Container(
+                width=500,  # Puede ser un poco más ancho para el formulario
+                content=ft.Column(
+                    [
+                        ft.Row([self._edit_dd_cliente, self._edit_dd_servicio]),
+                        self._edit_txt_vehiculo,
+                        self._edit_txt_descripcion,
+                        self._edit_txt_estado,
+                    ],
+                    spacing=15,
+                    scroll=ft.ScrollMode.ADAPTIVE,
+                ),
+            ),
+            actions=[
+                ft.ElevatedButton(
+                    "Guardar Cambios", on_click=lambda e: self._guardar_cambios(e)
+                ),
+                ft.TextButton(
+                    "Cancelar", on_click=lambda e: self.close_dialogo(e)
+                ),  # Handler para cancelar
+            ],
             actions_alignment=ft.MainAxisAlignment.END,
         )
 
     # -----METODOS-----
+
     def _on_hover(self, e):
         container = e.control
         hover = e.data == "true"
@@ -129,10 +252,128 @@ class OrdenContainer(ft.Container):
         container.elevation = 20 if hover else 5  # Ajustar elevación con hover
         container.update()
 
+    def _cargar_dd_edicion(self):
+        clientes = self.manejo_cliente.cargar_clientes()
+        servicios = self.manejo_servicio.cargar_servicios()
+
+        self._edit_dd_cliente.options = [
+            ft.dropdown.Option(
+                key=cliente.get("id", ""), text=cliente.get("nombre", "")
+            )
+            for cliente in clientes
+        ]
+
+        self._edit_dd_servicio.options = [
+            ft.dropdown.Option(
+                key=servicio.get("id", ""), text=servicio.get("descripcion", "")
+            )
+            for servicio in servicios
+        ]
+
     def abrir_dialogo(self, e):
         e.control.page.overlay.append(self.detalles_dialogo)
         self.detalles_dialogo.open = True
         e.control.page.update()
+
+    def abrir_dialogo_edicion(self, e):
+        self.close_dialogo(e)
+
+        orden_data = self.manejo_orden.cargar_orden_id(self.orden_id)
+
+        if orden_data:
+
+            # Rellenar los campos del formulario de edición con los datos frescos
+            self._edit_dd_cliente.value = str(
+                orden_data.get("cliente", "")
+            )  # Asume que el ID del cliente viene en 'cliente'
+            self._edit_dd_servicio.value = str(
+                orden_data.get("servicio", "")
+            )  # Asume que el ID del servicio viene en 'servicio'
+            self._edit_txt_vehiculo.value = orden_data.get("vehiculo", "")
+            self._edit_txt_descripcion.value = orden_data.get("descripcion", "")
+            self._edit_txt_estado.value = orden_data.get("estado", "")
+
+            self.dialogo_edicion.title.value = f"Editar Orden N⁰ {self.orden_id}"
+
+            self._cargar_dd_edicion()
+            # Añadir y abrir el diálogo de edición
+            e.page.overlay.append(self.dialogo_edicion)
+            self.dialogo_edicion.open = True
+            e.page.update()
+
+        else:
+            # Manejar el caso en que no se pudo cargar la orden
+            print(
+                f"Error: No se pudo cargar la orden con ID {self.orden_id} para editar."
+            )
+
+    def _guardar_cambios(self, e):
+        cliente_id_actualizado = self._edit_dd_cliente.value
+        servicio_id_actualizado = self._edit_dd_servicio.value
+        vehiculo_actualizado = self._edit_txt_vehiculo.value.strip()
+        descripcion_actualizado = self._edit_txt_descripcion.value.strip()
+        estado_actualizado = self._edit_txt_estado.value.strip()
+
+        if (
+                not cliente_id_actualizado
+                or not servicio_id_actualizado
+                or not vehiculo_actualizado
+                or not descripcion_actualizado
+                or not estado_actualizado
+        ):
+            return
+        orden_actualizada = self.manejo_orden.editar_orden(
+            self.orden_id,
+            cliente=cliente_id_actualizado,
+            servicio=servicio_id_actualizado,
+            vehiculo=vehiculo_actualizado,
+            descripcion=descripcion_actualizado,
+            estado=estado_actualizado,
+        )
+
+        if orden_actualizada:
+            print("Orden actualizada")
+            self.cliente = orden_actualizada.get("cliente_nombre", "")
+            self.servicio = orden_actualizada.get("servicio_nombre", "")
+            self.vehiculo = orden_actualizada.get("vehiculo", "")
+            self.descripcion = orden_actualizada.get("descripcion", "")
+            self.fecha_orden = orden_actualizada.get("fecha_orden", "")
+            self.estado = orden_actualizada.get("estado", "")
+
+            self._txt_servicio_card.value = self.servicio
+            self._txt_cliente_card.value = self.cliente
+            self._txt_vehiculo_card.value = self.vehiculo
+            self._txt_descripcion_card.value = self.descripcion
+            self._txt_fecha_orden_card.value = self.fecha_orden
+            self._txt_estado_card.value = self.estado
+
+            self._txt_dialog_vehiculo_title.value = (
+                f"Orden N⁰ {self.orden_id}:    {self.vehiculo}"
+            )
+            self._txt_dialog_servicio_value.value = self.servicio
+            self._txt_dialog_cliente_value.value = self.cliente
+            self._txt_dialog_descripcion_value.value = self.descripcion
+            self._txt_dialog_fecha_orden_value.value = self.fecha_orden
+            self._txt_dialog_estado_value.value = self.estado
+
+            self.update()
+            self.close_dialogo(e)
+
+    def eliminar_orden(self, e):
+        try:
+            orden_eliminada = self.manejo_orden.eliminar_orden(self.orden_id)
+
+            if orden_eliminada:
+                print(f"Orden eliminada id: {self.orden_id}")
+                if self in container_ordenes_ui.grid.controls:
+                    container_ordenes_ui.grid.controls.remove(self)
+                    container_ordenes_ui.grid.update()
+                else:
+                    print(f"Contenedor de id {self.orden_id} no esta en el grid")
+
+            self.close_dialogo(e)
+        except Exception as e:
+            print(e)
 
     def close_dialogo(self, e):
         """Cierra el dialogo modal"""
@@ -280,6 +521,7 @@ class AgregarOrden(ft.Container):
         )
         if orden_guardada:
             orden = OrdenContainer(
+                orden_id=orden_guardada.get("id", ""),
                 cliente=orden_guardada.get(
                     "cliente_nombre", ""
                 ),  # O el nombre del cliente si lo devuelves
@@ -296,6 +538,12 @@ class AgregarOrden(ft.Container):
                 estado=orden_guardada.get("estado", ""),
             )
             container_ordenes_ui.grid.controls.insert(1, orden)
+            self.txt_estado.value = ""
+            self.txt_vehiculo.value = ""
+            self.txt_descripcion.value = ""
+            self.txt_estado.update()
+            self.txt_descripcion.update()
+            self.txt_vehiculo.update()
 
         e.page.overlay[-1].open = False
         e.page.update()
@@ -313,6 +561,7 @@ def cargar_orden(e):
     ordenes.reverse()
     for datos in ordenes:
         orden = OrdenContainer(
+            datos.get("id", ""),
             datos.get("cliente_nombre", ""),
             datos.get("servicio_nombre", ""),
             datos.get("vehiculo", ""),

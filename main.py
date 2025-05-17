@@ -1,6 +1,5 @@
 import flet as ft
 from tabs import tabs
-
 from logica.manejo_cliente import ManejoCliente
 
 clientes = ManejoCliente()
