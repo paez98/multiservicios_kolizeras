@@ -33,10 +33,10 @@ class DialogHandler:
 
     @staticmethod
     def crear_dialogo_edicion(
-        page,
-        cliente_data: dict,
-        manejo_cliente: ManejoCliente,
-        on_edit: Optional[callable] = None,
+            page,
+            cliente_data: dict,
+            manejo_cliente: ManejoCliente,
+            on_edit: Optional[callable] = None,
     ):
         def cerrar_dialogo(e):
             if page.overlay and isinstance(page.overlay[-1], ft.AlertDialog):
@@ -112,8 +112,8 @@ class DialogHandler:
             on_edit(
                 {
                     "id": servicio_data["Id"],
-                    "descripcion": txt_descripcion.value,
-                    "precio": txt_precio.value,
+                    "description": txt_descripcion.value,
+                    "price": txt_precio.value,
                 }
             )
 
@@ -146,10 +146,10 @@ def crear_campo_texto(label, hint_text: Optional[str] = None, value: str = None)
 
 
 def crear_boton(
-    text,
-    icon: Optional[str] = None,
-    on_click: Optional[vars] = None,
-    color: Optional[str] = None,
+        text,
+        icon: Optional[str] = None,
+        on_click: Optional[vars] = None,
+        color: Optional[str] = None,
 ):
     "Creamos un boton estilizado"
     return ft.ElevatedButton(

@@ -9,6 +9,7 @@ def main(page: ft.Page):
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.title = "Taller Mecánico App"
     page.theme = ft.Theme(font_family="Poppins")
+
     page.window_resizable = True  # Permite redimensionar
     page.add(tabs)
     page.update()

@@ -9,11 +9,6 @@ from utils.utils import crear_boton, DialogHandler
 # ===============================================
 class ClienteUIState:
     def __init__(self):
-        # Componentes de la interfaz
-        # self.txt_nombre = crear_campo_texto("Nombre del cliente", "Ej: Alissa")
-        # self.txt_contacto = crear_campo_texto("Contacto", "Ej: +56912345678")
-        # self.txt_direccion = crear_campo_texto("Dirección", "Ej: Calle Principal #123")
-
         # Botones
         self.btn_eliminar = crear_boton("Eliminar", ft.Icons.PERSON_REMOVE, None, "red")
         self.btn_agregar = crear_boton("Añadir", ft.Icons.PERSON_ADD, None, "green")
@@ -104,9 +99,9 @@ def _cargar_clientes(e, state: ClienteUIState):
             ft.DataRow(
                 cells=[
                     ft.DataCell(ft.Text(str(cliente.get("id")))),
-                    ft.DataCell(ft.Text(cliente.get("nombre"), "")),
-                    ft.DataCell(ft.Text(cliente.get("telefono", ""))),
-                    ft.DataCell(ft.Text(cliente.get("direccion", ""))),
+                    ft.DataCell(ft.Text(cliente.get("name", ""))),
+                    ft.DataCell(ft.Text(cliente.get("phone", ""))),
+                    ft.DataCell(ft.Text(cliente.get("address", ""))),
                 ],
                 on_select_changed=lambda ev, s=state: _manejar_seleccion(ev, s),
             )

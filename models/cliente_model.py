@@ -1,12 +1,12 @@
 import json
 import requests
-import httpx
 from config import API_BASE_URL
 
 
-class ManejoCliente:
+class ClienteModel:
     def __init__(self):
-        self.api_url = f"{API_BASE_URL}clients/"
+        self.api_url = f"{API_BASE_URL}cliente/"
+        self.table_name = "alo"
 
     def cargar_clientes(self):
         """Carga los clientes desde la base de datos"""
@@ -24,9 +24,9 @@ class ManejoCliente:
     def guardar_cliente(self, nombre: str, telefono: str, direccion: str):
 
         datos_cliente = {
-            "name": nombre,
-            "phone": telefono,
-            "address": direccion,
+            "nombre": nombre,
+            "telefono": telefono,
+            "direccion": direccion,
         }
 
         try:
@@ -36,8 +36,8 @@ class ManejoCliente:
 
             response = requests.post(self.api_url, json=datos_cliente)
             response.raise_for_status()
-            print("Cliente guardado exitosamente (lógica API).")
-            return response.json()  # Retorna los datos del cliente creado
+            print("Cliente guardado exitosamente (model).")
+            return response.status_code
 
         # --- CAPTURA ESPECÍFICA para errores HTTP (incluyendo 400) ---
         except requests.exceptions.HTTPError as http_err:
@@ -80,9 +80,9 @@ class ManejoCliente:
 
     def editar_cliente(self, cliente_id, nombre, telefono, direccion):
         """Edita un cliente en la base de datos"""
-        datos_cliente = {"name": nombre, "phone": telefono, "address": direccion}
+        datos_cliente = {"nombre": nombre, "telefono": telefono, "direccion": direccion}
         try:
-            response = requests.patch(f"{self.api_url + cliente_id}/", json=datos_cliente)
+            response = requests.put(f"{self.api_url + cliente_id}/", json=datos_cliente)
             response.raise_for_status()
             print(f"Cliente {cliente_id} editado exitosamente")
             return response.json()

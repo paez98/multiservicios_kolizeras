@@ -1,17 +1,15 @@
-from http.client import responses
 import requests
 from config import API_BASE_URL
-from client_supabase import supabase
 
 
 class ManejoOrdenes:
     def __init__(self):
-        self.api_url = f"{API_BASE_URL}orden/"
+        self.api_url = f"{API_BASE_URL}orders/"
 
     def cargar_ordenes(self):
         try:
             try:
-                response = requests.get(f"{API_BASE_URL}orden")
+                response = requests.get(f"{self.api_url}")
                 response.raise_for_status()
             except requests.ConnectionError:
                 print("Error de conexción: No se puedo conectar al sevidor")
@@ -49,11 +47,11 @@ class ManejoOrdenes:
 
     def guardar_orden(self, cliente, servicio, vehiculo, descripcion, estado):
         datos_orden = {
-            "cliente": cliente,
-            "servicio": servicio,
-            "vehiculo": vehiculo,
-            "descripcion": descripcion,
-            "estado": estado,
+            "client_id": cliente,
+            "service_id": servicio,
+            "vehicle": vehiculo,
+            "description": descripcion,
+            "status": estado,
         }
 
         try:
@@ -62,7 +60,7 @@ class ManejoOrdenes:
             return response.json()
         except requests.exceptions.HTTPError as http_err:
             print(f"Error al guardar {http_err}")
-            print(f"detalle de error, {http_err.response.json()}")
+            
             return
 
         except Exception as e:

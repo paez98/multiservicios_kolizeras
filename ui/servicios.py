@@ -85,8 +85,8 @@ def _cargar_servicio(e, state: ServicioUiState):
             ft.DataRow(
                 cells=[
                     ft.DataCell(ft.Text(str(cliente.get("id")))),
-                    ft.DataCell(ft.Text(cliente["descripcion"])),
-                    ft.DataCell(ft.Text(cliente["precio"])),
+                    ft.DataCell(ft.Text(cliente["description"])),
+                    ft.DataCell(ft.Text(cliente["price"])),
                 ],
                 on_select_changed=lambda e, s=state: _manejar_seleccion(e, s),
             )
@@ -138,6 +138,7 @@ def _eliminar_servicio(e, state: ServicioUiState):
             # _cargar_servicio(e, state)
             e.page.overlay[-1].open = False
             e.page.update()
+            _cargar_servicio(e, state)  # Refrescar la tabla
         except Exception as e:
             print(f"Error al eliminar el cliente: {e}")
 
@@ -159,12 +160,13 @@ def edit(e, state: ServicioUiState):
         try:
             state.manejo.editar_servicio(
                 datos_actualizados["id"],
-                datos_actualizados["descripcion"],
-                datos_actualizados["precio"],
+                datos_actualizados["description"],
+                datos_actualizados["price"],
             )
-            # _cargar_servicio(e, state)  # Refrescar la tabla
+
+            _cargar_servicio(e, state)  # Refrescar la tabla
         except Exception as error:
-            print(f"Error al editar cliente: {error}")
+            print(f"Error al editar servicio: {error}")
 
     DialogHandler.crear_dialogo_edicion_servicio(
         e.page, servicio_data=servicio_data, on_edit=guardar_cambios

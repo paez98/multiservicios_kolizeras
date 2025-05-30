@@ -491,12 +491,13 @@ class AgregarOrden(ft.Container):
 
     def cargar_dds(self):
         clientes = self.manejo_clientes.cargar_clientes()
+        print(clientes)
         servicios = self.manejo_servicios.cargar_servicios()
 
         # DD SERVICIOS
         self.dd_servicio.options = [
             ft.dropdown.Option(
-                text=servicio.get("descripcion", ""), key=str(servicio.get("id", ""))
+                text=servicio.get("description", ""), key=str(servicio.get("id", ""))
             )
             for servicio in servicios
         ]
@@ -505,7 +506,7 @@ class AgregarOrden(ft.Container):
         # DD CLIENTES
         self.dd_cliente.options = [
             ft.dropdown.Option(
-                key=cliente.get("id", ""), text=cliente.get("nombre", "")
+                text=cliente.get("name", ""), key=cliente.get("id", "")
             )
             for cliente in clientes
         ]

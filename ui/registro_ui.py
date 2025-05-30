@@ -40,7 +40,6 @@ def guardar_cliente_desde_dialogo(e, txt_nombre, txt_contacto, txt_direccion):
     dato_guardado = manejo_cliente.guardar_cliente(
         nombre_ingresado, telefono_ingresado, direccion_ingresada
     )
-    print(f"Este es mi print {dato_guardado}")
     if isinstance(dato_guardado, dict) and "errors" in dato_guardado:
         errores_api = dato_guardado["errors"]
 
@@ -139,7 +138,7 @@ def validar_campos_servicio(descripcion: str, precio: str):
 
 
 def guardar_desde_dialogo(
-    e, txt_descripcion, txt_precio, page: Optional[ft.Page] = None
+        e, txt_descripcion, txt_precio, page: Optional[ft.Page] = None
 ):
     errores = validar_campos_servicio(
         txt_descripcion.value.strip(), txt_precio.value.strip()
